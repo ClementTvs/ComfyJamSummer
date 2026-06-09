@@ -16,6 +16,7 @@ void AMyPlayerController::BeginPlay()
 void AMyPlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
+
     InputComponent->BindAction("Click", IE_Pressed, this, 
         &AMyPlayerController::OnClickPressed);
     InputComponent->BindAction("Click", IE_Released, this, 
@@ -38,10 +39,17 @@ void AMyPlayerController::OnClickReleased()
 void AMyPlayerController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    if (SelectedActor)
+    if (!SelectedActor)
+        return;
+
+    FVector WorldLocation;
+    FVector WorldDirection;
+    if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
     {
-        FHitResult Hit;
-        GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-        SelectedActor->SetActorLocation(Hit.Location);
+        // On garde Y (l'axe de profondeur) fixe, on bouge X/Z dans le plan du jeu
+        FVector NewLocation = SelectedActor->GetActorLocation();
+        NewLocation.X = WorldLocation.X;
+        NewLocation.Z = WorldLocation.Z;
+        SelectedActor->SetActorLocation(NewLocation);
     }
 }
