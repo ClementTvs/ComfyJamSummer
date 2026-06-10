@@ -28,6 +28,7 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 	private:
 		UPROPERTY()
 		AActor* SelectedActor;
+		FVector GrabOffset;
 
 		void OnClickPressed();
 		void OnClickReleased();

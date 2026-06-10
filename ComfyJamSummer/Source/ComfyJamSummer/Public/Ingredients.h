@@ -26,4 +26,10 @@ class COMFYJAMSUMMER_API AIngredients : public AMoveableSprite
 	AIngredients();
 	
 	const EIngredientsTypes &getIngredientType() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient")
+    void OnGrabbed();
+
+    UFUNCTION(BlueprintCallable, Category = "Ingredient")
+    void OnReleased();
 };

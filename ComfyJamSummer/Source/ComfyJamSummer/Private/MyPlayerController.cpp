@@ -2,6 +2,7 @@
 
 
 #include "MyPlayerController.h"
+#include "Ingredients.h"
 
 void AMyPlayerController::BeginPlay()
 {
@@ -29,14 +30,27 @@ void AMyPlayerController::OnClickPressed()
     GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
     if (Hit.GetActor())
-    {
-        if (!Hit.GetActor()->IsA(ABlender::StaticClass()))
-            SelectedActor = Hit.GetActor();
-    }
+	{
+		if (Hit.GetComponent()->GetName() == TEXT("HitBox"))
+		{
+			if (!Hit.GetActor()->IsA(ABlender::StaticClass()))
+                SelectedActor = Hit.GetActor();
+
+			if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
+				Ingredient->OnGrabbed();
+
+			FVector WorldLocation, WorldDirection;
+			if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
+				GrabOffset = SelectedActor->GetActorLocation() - WorldLocation;
+
+		}
+	}
 }
 
 void AMyPlayerController::OnClickReleased()
 {
+	if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
+		Ingredient->OnReleased();
     SelectedActor = nullptr;
 }
 
@@ -51,8 +65,8 @@ void AMyPlayerController::Tick(float DeltaTime)
     if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
     {
         FVector NewLocation = SelectedActor->GetActorLocation();
-        NewLocation.X = WorldLocation.X;
-        NewLocation.Z = WorldLocation.Z;
+        NewLocation.X = WorldLocation.X + GrabOffset.X;;
+        NewLocation.Z = WorldLocation.Z + GrabOffset.Z;
         SelectedActor->SetActorLocation(NewLocation);
     }
 }

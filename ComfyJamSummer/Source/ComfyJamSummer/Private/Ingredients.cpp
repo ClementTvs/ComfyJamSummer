@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Kismet/GameplayStatics.h"
+#include "Alien.h"
 #include "Ingredients.h"
 
 
@@ -20,4 +22,30 @@ AIngredients::AIngredients()
 const EIngredientsTypes &AIngredients::getIngredientType() const
 {
     return ingredientType;
+}
+
+
+void AIngredients::OnGrabbed()
+{
+    if (ingredientType == EIngredientsTypes::gasoline)
+    {
+        if (AAlien* Alien = Cast<AAlien>(
+            UGameplayStatics::GetActorOfClass(GetWorld(), AAlien::StaticClass())))
+        {
+            Alien->OnGasolineGrab();
+            Alien->bGasolineInUse = true;
+        }
+    }
+}
+
+void AIngredients::OnReleased()
+{
+    if (ingredientType == EIngredientsTypes::gasoline)
+    {
+        if (AAlien* Alien = Cast<AAlien>(
+            UGameplayStatics::GetActorOfClass(GetWorld(), AAlien::StaticClass())))
+        {
+            Alien->bGasolineInUse = false;
+        }
+    }
 }

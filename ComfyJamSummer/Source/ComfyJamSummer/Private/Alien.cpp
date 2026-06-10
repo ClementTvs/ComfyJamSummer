@@ -17,12 +17,39 @@ AAlien::AAlien()
 void AAlien::BeginPlay()
 {
     Super::BeginPlay();
+	StartWatching();
+}
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+void AAlien::StartWatching()
+{
+	State = EAlienState::Idle;
+
+	if (bGasolineInUse)
+		OnPlayerCaught();
+
+	float Duration = FMath::RandRange(WatchTimeMin, WatchTimeMax);
+	GetWorldTimerManager().SetTimer(StateTimer, this, &AAlien::StartLookingAway, Duration, false);
+}
+
+void AAlien::StartLookingAway()
+{
+	State = EAlienState::LookAway;
+	float Duration = FMath::RandRange(LookAwayTimeMin, LookAwayTimeMax);
+	GetWorldTimerManager().SetTimer(StateTimer, this, &AAlien::StartWatching, Duration, false);
+}
+
+void AAlien::OnGasolineGrab()
+{
+	if (isWatching())
 	{
-		State = (State == EAlienState::Idle) ? EAlienState::LookAway : EAlienState::Idle;
-	}, 2.0f, true);
+		OnPlayerCaught();
+	}
+}
+
+void AAlien::OnPlayerCaught()
+{
+	State = EAlienState::Idle;
+	UE_LOG(LogTemp, Warning, TEXT("Player caught"));
 }
 
 void AAlien::Tick(float DeltaTime)
@@ -33,4 +60,9 @@ void AAlien::Tick(float DeltaTime)
 void AAlien::SetAlienState(EAlienState NewState) 
 {
 	State = NewState;
+}
+
+bool AAlien::isWatching() const
+{
+	return State == EAlienState::Idle;
 }

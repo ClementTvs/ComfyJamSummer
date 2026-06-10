@@ -37,7 +37,6 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 
 	ABlender();
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent *root;
