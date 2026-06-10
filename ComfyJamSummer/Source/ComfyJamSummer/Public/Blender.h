@@ -19,9 +19,19 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 	
 	private:
 
+	bool isOverBlender = false;
+
+	// UFUNCTION()
+	// void OnTopTouchBottom(UPrimitiveComponent* OverlappedComp,
+	// 	AActor* OtherActor,
+	// 	UPrimitiveComponent* OtherComp,
+	// 	int32 OtherBodyIndex,
+	// 	bool bFromSweep,
+	// 	const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnTopTouchBottom(UPrimitiveComponent* OverlappedComp,
+	void OnTopEnter(
+		UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
@@ -29,11 +39,21 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 		const FHitResult& SweepResult);
 
 	UFUNCTION()
+	void OnTopLeaveBottom(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
+
+	UFUNCTION()
 	void OnBlenderClicked(UPrimitiveComponent* ClickedComp, FKey ButtonPressed);
 
 	bool ContainsRecipe(const TArray<EIngredientsTypes>& Recipe);
 
 	public:
+
+	bool IsOverBlender() const;
+
 
 	ABlender();
 	virtual void BeginPlay() override;
@@ -46,9 +66,6 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent *hitBox;
-
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent *completeBlenderSprite;
 
 	UPROPERTY(VisibleAnywhere)
 	UPaperSpriteComponent *blenderSprite;

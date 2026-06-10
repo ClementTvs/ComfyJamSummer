@@ -8,12 +8,16 @@ ABlenderTop::ABlenderTop()
     fillHitBox = CreateDefaultSubobject<UBoxComponent>("FillHitBox");
     fillHitBox->SetupAttachment(root);
 
+    fillHitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+    
     fillHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     fillHitBox->SetCollisionObjectType(ECC_WorldDynamic);
     fillHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-    fillHitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap); 
+    fillHitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     fillHitBox->SetGenerateOverlapEvents(true);
     fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlenderTop::OnIngredientOverlap);
+
+    hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 }
 
 const TArray<EIngredientsTypes> &ABlenderTop::getCurrentIngredients() const

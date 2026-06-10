@@ -35,7 +35,8 @@ void AMyPlayerController::OnClickPressed()
 		{
 			if (!Hit.GetActor()->IsA(ABlender::StaticClass()))
                 SelectedActor = Hit.GetActor();
-
+            else
+                return ;
 			if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
 				Ingredient->OnGrabbed();
 
@@ -51,6 +52,11 @@ void AMyPlayerController::OnClickReleased()
 {
 	if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
 		Ingredient->OnReleased();
+    if (ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass())))
+    {
+        if (blender->IsOverBlender())
+            UE_LOG(LogTemp, Warning, TEXT("FUUUUUUUSIONNN"));
+    }
     SelectedActor = nullptr;
 }
 

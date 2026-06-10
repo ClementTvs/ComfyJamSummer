@@ -8,9 +8,6 @@ ABlender::ABlender()
     root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     RootComponent = root;
 
-    completeBlenderSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("CompliteBlenderSprite"));
-    completeBlenderSprite->SetupAttachment(root);
-
     hitBox = CreateDefaultSubobject<UBoxComponent>("HitBox");
     blenderSprite = CreateDefaultSubobject<UPaperSpriteComponent>("BlenderSprite");
 
@@ -24,7 +21,9 @@ ABlender::ABlender()
     hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     hitBox->SetGenerateOverlapEvents(true);
     hitBox->OnClicked.AddDynamic(this, &ABlender::OnBlenderClicked);
-    hitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlender::OnTopTouchBottom);
+    // hitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlender::OnTopTouchBottom);
+    hitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlender::OnTopEnter);
+    hitBox->OnComponentEndOverlap.AddDynamic(this, &ABlender::OnTopLeaveBottom);
 }
 
 void ABlender::BeginPlay()
@@ -32,6 +31,11 @@ void ABlender::BeginPlay()
     Super::BeginPlay();
 
     blenderTopRef = Cast<ABlenderTop>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlenderTop::StaticClass()));
+}
+
+bool ABlender::IsOverBlender() const
+{
+    return isOverBlender;
 }
 
 bool ABlender::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
@@ -47,15 +51,15 @@ bool ABlender::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
     return true;
 }
 
-void ABlender::OnTopTouchBottom(UPrimitiveComponent* OverlappedComp,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
-{
-    UE_LOG(LogTemp, Warning, TEXT("TOUCHEEE"));
-}
+// void ABlender::OnTopTouchBottom(UPrimitiveComponent* OverlappedComp,
+// 	AActor* OtherActor,
+// 	UPrimitiveComponent* OtherComp,
+// 	int32 OtherBodyIndex,
+// 	bool bFromSweep,
+// 	const FHitResult& SweepResult)
+// {
+//     UE_LOG(LogTemp, Warning, TEXT("TOUCHEEE"));
+// }
 
 void ABlender::OnBlenderClicked(UPrimitiveComponent* ClickedComp, FKey ButtonPressed)
 {
@@ -80,5 +84,32 @@ void ABlender::OnBlenderClicked(UPrimitiveComponent* ClickedComp, FKey ButtonPre
         else
             UE_LOG(LogTemp, Warning, TEXT("CEST QUOI CE TRUC"));
         blenderTopRef->clearCurrentIngredients();
+    }
+}
+
+void ABlender::OnTopEnter(
+    UPrimitiveComponent* OverlappedComp,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex,
+    bool bFromSweep,
+    const FHitResult& SweepResult)
+{
+    if (Cast<ABlenderTop>(OtherActor))
+    {
+        isOverBlender = true;
+    }
+}
+
+void ABlender::OnTopLeaveBottom(
+    UPrimitiveComponent* OverlappedComp,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex)
+{
+
+    if (Cast<ABlenderTop>(OtherActor))
+    {
+        isOverBlender = false;
     }
 }
