@@ -8,10 +8,12 @@ AMoveableSprite::AMoveableSprite()
 {
     root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     RootComponent = root;
+    moveable = CreateDefaultSubobject<USceneComponent>(TEXT("Moveable"));
+    moveable->SetupAttachment(root);
     hitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
     sprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("Sprite"));
-    hitBox->SetupAttachment(root);
-    sprite->SetupAttachment(root);
+    hitBox->SetupAttachment(moveable);
+    sprite->SetupAttachment(moveable);
 
     // Le sprite ne doit pas intercepter le clic à la place du hitBox
     sprite->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -29,6 +31,11 @@ AMoveableSprite::AMoveableSprite()
 void AMoveableSprite::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+USceneComponent *AMoveableSprite::GetMoveable() const
+{
+    return moveable; 
 }
 
 void AMoveableSprite::Tick(float DeltaTime)
