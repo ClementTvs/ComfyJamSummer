@@ -1,13 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Blender.h"
 #include "BlenderTop.h"
 
 ABlenderTop::ABlenderTop()
 {
-    fillHitBox = CreateDefaultSubobject<UBoxComponent>("FillHitBox");
-    fillHitBox->SetupAttachment(root);
+    PrimaryActorTick.bCanEverTick = true;
 
+    fillHitBox = CreateDefaultSubobject<UBoxComponent>("FillHitBox");
+    timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
+    fillHitBox->SetupAttachment(root);
+    timerWidgetInstance->SetupAttachment(root);
+    
     fillHitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
     
     fillHitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -18,9 +22,20 @@ ABlenderTop::ABlenderTop()
     fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlenderTop::OnIngredientOverlap);
     fillHitBox->OnComponentEndOverlap.AddDynamic(this, &ABlenderTop::OnIngredientEndOverlap);
 
-
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::Screen);
+    timerWidgetInstance->SetDrawSize(FVector2D(150.f, 40.f));
+    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 1.f));
+    
     hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 }
+
+void ABlenderTop::BeginPlay()
+{
+    Super::BeginPlay();
+
+    timerWidgetInstance->SetWidgetClass(timerWidgetClass);
+}
+
 
 const TArray<EIngredientsTypes> &ABlenderTop::getCurrentIngredients() const
 {
@@ -61,7 +76,10 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-    if (OtherComp->GetName() != TEXT("HitBox"))
+
+    ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
+
+    if (OtherComp->GetName() != TEXT("HitBox") || blender->IsBlenderWorking() )
         return;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
@@ -78,14 +96,52 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
             if (ingredientType == EIngredientsTypes::gasoline)
             {
                 UE_LOG(LogTemp, Warning, TEXT("PUTING GASOLINEEE..."));
-                GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this, &ABlenderTop::ValidateIngredient, 3.0f, false);
+                timerDuration = 3.0f;
+                GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this, &ABlenderTop::ValidateIngredient, timerDuration, false);
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("PUTING INGREDIENT..."));
-                GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this, &ABlenderTop::ValidateIngredient, 1.0f, false);
+                timerDuration = 1.0f;
+                GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this, &ABlenderTop::ValidateIngredient, timerDuration, false);
             }
 
+        }
+    }
+}
+
+void ABlenderTop::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (GetWorld()->GetTimerManager().IsTimerActive(IngredientTimer) && timerWidgetInstance)
+    {
+
+        UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
+
+        if (Widget)
+        {
+            Widget->SetVisibility(ESlateVisibility::Visible);
+
+            float Remaining = GetWorld()->GetTimerManager().GetTimerRemaining(IngredientTimer);
+            float Progress = Remaining / timerDuration;
+
+            UProgressBar* Bar = Cast<UProgressBar>(
+                Widget->GetWidgetFromName(TEXT("TimerProgressBar"))
+            );
+
+            if (Bar)
+            {
+                Bar->SetPercent(Progress);
+            }
+        }
+    }
+    else if (timerWidgetInstance)
+    {
+        UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
+
+        if (Widget)
+        {
+            Widget->SetVisibility(ESlateVisibility::Hidden);
         }
     }
 }

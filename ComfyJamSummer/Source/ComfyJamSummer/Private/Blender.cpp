@@ -5,14 +5,19 @@
 
 ABlender::ABlender()
 {
+    PrimaryActorTick.bCanEverTick = true;
+
     root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     RootComponent = root;
 
     hitBox = CreateDefaultSubobject<UBoxComponent>("HitBox");
     blenderSprite = CreateDefaultSubobject<UPaperSpriteComponent>("BlenderSprite");
+    timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
+
 
     hitBox->SetupAttachment(root);
     blenderSprite->SetupAttachment(root);
+    timerWidgetInstance->SetupAttachment(root);
 
     hitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     hitBox->SetCollisionObjectType(ECC_WorldStatic);
@@ -21,9 +26,15 @@ ABlender::ABlender()
     hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     hitBox->SetGenerateOverlapEvents(true);
     hitBox->OnClicked.AddDynamic(this, &ABlender::OnBlenderClicked);
-    // hitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlender::OnTopTouchBottom);
     hitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlender::OnTopEnter);
     hitBox->OnComponentEndOverlap.AddDynamic(this, &ABlender::OnTopLeaveBottom);
+
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
+    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, -25.f));
+    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 100.f));
+    timerWidgetInstance->SetWorldScale3D(FVector(0.09f, 0.09f, 0.09f));
+    timerWidgetInstance->SetWorldRotation(FRotator(0.f, -90.f, 0.f));
+    
 }
 
 void ABlender::BeginPlay()
@@ -32,6 +43,9 @@ void ABlender::BeginPlay()
 
     blenderTopRef = Cast<ABlenderTop>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlenderTop::StaticClass()));
     isBlenderFusion = true;
+    UE_LOG(LogTemp, Warning, TEXT("SIU"));
+
+    timerWidgetInstance->SetWidgetClass(timerWidgetClass);
 }
 
 bool ABlender::IsOverBlender() const
@@ -44,11 +58,52 @@ bool ABlender::IsBlenderFusion() const
     return isBlenderFusion;
 }
 
+bool ABlender::IsBlenderWorking() const
+{
+    return isBlenderWorking;
+}
+
 void ABlender::isBlenderFusionFalse()
 {
     isBlenderFusion = false;
     GetWorld()->GetTimerManager().ClearTimer(blenderTimer);
     UE_LOG(LogTemp, Warning, TEXT("BLENDER ARRETE"));
+}
+
+void ABlender::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (GetWorld()->GetTimerManager().IsTimerActive(blenderTimer) && timerWidgetInstance)
+    {
+
+        UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
+        if (Widget)
+        {
+            Widget->SetVisibility(ESlateVisibility::Visible);
+
+            float Remaining = GetWorld()->GetTimerManager().GetTimerRemaining(blenderTimer);
+            float Progress = Remaining / timerDuration;
+
+            UProgressBar* Bar = Cast<UProgressBar>(
+                Widget->GetWidgetFromName(TEXT("TimerProgressBar"))
+            );
+
+            if (Bar)
+            {
+                Bar->SetPercent(Progress);
+            }
+        }
+    }
+    else if (timerWidgetInstance)
+    {
+        UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
+
+        if (Widget)
+        {
+            Widget->SetVisibility(ESlateVisibility::Hidden);
+        }
+    }
 }
 
 bool ABlender::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
@@ -80,6 +135,7 @@ void ABlender::BlenderStart()
     else
         UE_LOG(LogTemp, Warning, TEXT("CEST QUOI CE TRUC"));
     blenderTopRef->clearCurrentIngredients();
+    isBlenderWorking = false;
 }
 
 void ABlender::OnBlenderClicked(UPrimitiveComponent* ClickedComp, FKey ButtonPressed)
@@ -93,7 +149,9 @@ void ABlender::OnBlenderClicked(UPrimitiveComponent* ClickedComp, FKey ButtonPre
         }
         else
         {
+            isBlenderWorking = true;
             UE_LOG(LogTemp, Warning, TEXT("BRRRRRR..."));
+            timerDuration = 5.0f;
             GetWorld()->GetTimerManager().SetTimer(blenderTimer, this, &ABlender::BlenderStart, 5.0f, false);
         }
     }

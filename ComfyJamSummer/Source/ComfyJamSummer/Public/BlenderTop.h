@@ -6,6 +6,9 @@
 #include "MoveableSprite.h"
 #include "IngredientsTypes.h"
 #include "Ingredients.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/ProgressBar.h"
+#include "Components/WidgetComponent.h"
 #include "BlenderTop.generated.h"
 
 /**
@@ -42,9 +45,20 @@ class COMFYJAMSUMMER_API ABlenderTop : public AMoveableSprite
 
 	public :
 
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
 	ABlenderTop();
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent *fillHitBox;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> timerWidgetClass;
+
+	float timerDuration;
+
+	UPROPERTY()
+	UWidgetComponent* timerWidgetInstance;
 
 	const TArray<EIngredientsTypes>& getCurrentIngredients() const;
 	void clearCurrentIngredients();

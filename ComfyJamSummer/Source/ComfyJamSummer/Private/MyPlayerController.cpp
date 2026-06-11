@@ -82,7 +82,7 @@ void AMyPlayerController::Tick(float DeltaTime)
     if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
     {
         FVector NewLocation = SelectedActor->GetActorLocation();
-        NewLocation.X = WorldLocation.X + GrabOffset.X;;
+        NewLocation.X = WorldLocation.X + GrabOffset.X;
         NewLocation.Z = WorldLocation.Z + GrabOffset.Z;
         SelectedActor->SetActorLocation(NewLocation);
     }

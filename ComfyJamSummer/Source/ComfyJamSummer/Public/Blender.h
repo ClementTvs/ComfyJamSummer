@@ -7,6 +7,8 @@
 #include "Ingredients.h"
 #include "BlenderTop.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ProgressBar.h"
+#include "Components/WidgetComponent.h"
 #include "Blender.generated.h"
 
 /**
@@ -21,6 +23,8 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 
 	bool isOverBlender = false;
 	bool isBlenderFusion = false;
+	bool isBlenderWorking = false;
+
 	FTimerHandle blenderTimer;
 
 	// UFUNCTION()
@@ -55,10 +59,14 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 	bool ContainsRecipe(const TArray<EIngredientsTypes>& Recipe);
 
 	public:
+	
+	virtual void Tick(float DeltaTime) override;
 
 	bool IsOverBlender() const;
 	bool IsBlenderFusion() const;
+	bool IsBlenderWorking() const;
 	void isBlenderFusionFalse();
+	float timerDuration;
 
 	UFUNCTION()
 	void FusionBlender();
@@ -68,6 +76,12 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent *root;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> timerWidgetClass;
+
+	UPROPERTY()
+	UWidgetComponent* timerWidgetInstance;
 
 	UPROPERTY()
 	ABlenderTop* blenderTopRef;
