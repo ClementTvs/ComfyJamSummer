@@ -22,9 +22,11 @@ ABlenderTop::ABlenderTop()
     fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlenderTop::OnIngredientOverlap);
     fillHitBox->OnComponentEndOverlap.AddDynamic(this, &ABlenderTop::OnIngredientEndOverlap);
 
-    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::Screen);
-    timerWidgetInstance->SetDrawSize(FVector2D(150.f, 40.f));
-    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 1.f));
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
+    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 25.f));
+    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
+    timerWidgetInstance->SetWorldScale3D(FVector(0.07f, 0.07f, 0.07f));
+    timerWidgetInstance->SetWorldRotation(FRotator(0.f, -90.f, 0.f));
     
     hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 }
@@ -61,9 +63,11 @@ void ABlenderTop::pinaColadaDrink()
     drink = EDrinks::pinaColada;
 }
 
-EDrinks ABlenderTop::getDrink() const
+EDrinks ABlenderTop::getDrink()
 {
-    return drink;
+    EDrinks temp = drink;
+    drink = EDrinks::noDrink;
+    return temp;
 }
 
 void ABlenderTop::OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
@@ -88,7 +92,7 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
 
     ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
 
-    if (OtherComp->GetName() != TEXT("HitBox") || blender->IsBlenderWorking() )
+    if (OtherComp->GetName() != TEXT("HitBox") || blender->IsBlenderWorking() || drink != EDrinks::noDrink )
         return;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
