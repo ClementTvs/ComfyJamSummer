@@ -30,6 +30,11 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 		AActor* SelectedActor;
 		FVector GrabOffset;
 
+		bool isDragging = false;
+
 		void OnClickPressed();
 		void OnClickReleased();
-	};
+	
+	public:
+		bool getIsDragging() const;
+};

@@ -29,6 +29,8 @@ void AMyPlayerController::OnClickPressed()
     FHitResult Hit;
     GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
+    if (!Hit.GetActor()->IsA(ABlenderTop::StaticClass()))
+        isDragging = true;
     if (Hit.GetActor())
 	{
 		if (Hit.GetComponent()->GetName() == TEXT("HitBox"))
@@ -57,6 +59,11 @@ void AMyPlayerController::OnClickPressed()
 	}
 }
 
+bool AMyPlayerController::getIsDragging() const
+{
+    return isDragging;
+}
+
 void AMyPlayerController::OnClickReleased()
 {
 	if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
@@ -69,6 +76,7 @@ void AMyPlayerController::OnClickReleased()
         }
     }
     SelectedActor = nullptr;
+    isDragging = false;
 }
 
 void AMyPlayerController::Tick(float DeltaTime)

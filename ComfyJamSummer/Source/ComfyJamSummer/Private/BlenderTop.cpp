@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Blender.h"
+#include "MyPlayerController.h"
 #include "BlenderTop.h"
 
 ABlenderTop::ABlenderTop()
@@ -89,10 +90,10 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-
+    AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
     ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
 
-    if (OtherComp->GetName() != TEXT("HitBox") || blender->IsBlenderWorking() || drink != EDrinks::noDrink )
+    if (OtherComp->GetName() != TEXT("HitBox") || blender->IsBlenderWorking() || drink != EDrinks::noDrink || !pc->getIsDragging())
         return;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
