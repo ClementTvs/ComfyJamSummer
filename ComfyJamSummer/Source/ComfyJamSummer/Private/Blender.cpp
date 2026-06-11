@@ -31,6 +31,7 @@ void ABlender::BeginPlay()
     Super::BeginPlay();
 
     blenderTopRef = Cast<ABlenderTop>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlenderTop::StaticClass()));
+    isBlenderFusion = true;
 }
 
 bool ABlender::IsOverBlender() const
@@ -60,16 +61,6 @@ bool ABlender::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
     }
     return true;
 }
-
-// void ABlender::OnTopTouchBottom(UPrimitiveComponent* OverlappedComp,
-// 	AActor* OtherActor,
-// 	UPrimitiveComponent* OtherComp,
-// 	int32 OtherBodyIndex,
-// 	bool bFromSweep,
-// 	const FHitResult& SweepResult)
-// {
-//     UE_LOG(LogTemp, Warning, TEXT("TOUCHEEE"));
-// }
 
 void ABlender::OnBlenderClicked(UPrimitiveComponent* ClickedComp, FKey ButtonPressed)
 {
