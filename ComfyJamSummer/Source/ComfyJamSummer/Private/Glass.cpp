@@ -15,14 +15,3 @@ AGlass::AGlass()
     fillHitBox->SetGenerateOverlapEvents(true);
     // fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGlass::OnIngredientOverlap);
 }
-
-// void AGlass::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
-// 	AActor* OtherActor,
-// 	UPrimitiveComponent* OtherComp,
-// 	int32 OtherBodyIndex,
-// 	bool bFromSweep,
-// 	const FHitResult& SweepResult)
-// {
-//     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
-//     {}
-// }

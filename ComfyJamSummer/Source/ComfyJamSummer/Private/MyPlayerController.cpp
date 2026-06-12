@@ -71,6 +71,7 @@ void AMyPlayerController::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     if (!SelectedActor)
         return;
+
     FVector WorldLocation;
     FVector WorldDirection;
     if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))

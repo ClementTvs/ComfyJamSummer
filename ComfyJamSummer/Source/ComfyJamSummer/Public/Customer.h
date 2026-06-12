@@ -1,43 +1,70 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Customer.generated.h"
 
+UENUM()
+enum class ECustomerState : uint8
+{
+	Neutral,
+	Annoyed,
+	Angry,
+	Served
+};
+
 UCLASS()
 class COMFYJAMSUMMER_API ACustomer : public AActor
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
 public:
-    ACustomer();
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Customer")
-    EDrinkType OrderedDrink;
-
-    UPROPERTY(EditAnywhere, Category = "Customer")
-    float MaxPatience = 20.f;
-
-    UFUNCTION(BlueprintCallable, Category = "Customer")
-    void ReceiveGlass(class AGlass* Glass);
+	ACustomer();
 
 protected:
-    virtual void BeginPlay() override;
-    virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
 
-    UPROPERTY(VisibleAnywhere, Category = "Visual")
-    class UPaperSpriteComponent* SpriteComp;
+	UFUNCTION()
+	void OnGlassOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
 
-    UPROPERTY(EditAnywhere, Category = "Customer|Sprites")
-    class UPaperSprite* NormalSprite;
-    UPROPERTY(EditAnywhere, Category = "Customer|Sprites")
-    class UPaperSprite* DeadSprite;
+public:
+	UPROPERTY(VisibleAnywhere)
+	class UPaperSpriteComponent* spriteComp;
 
-    float CurrentPatience;
-    bool bServed = false;
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* serveHitBox;
 
-    void Serve();
-    void Die();
-    void Leave();
+	UPROPERTY(EditAnywhere, Category = "Sprites|Waiting")
+	class UPaperSprite* neutralSprite;
+	UPROPERTY(EditAnywhere, Category = "Sprites|Waiting")
+	class UPaperSprite* annoyedSprite;
+	UPROPERTY(EditAnywhere, Category = "Sprites|Waiting")
+	class UPaperSprite* angrySprite;
+
+	UPROPERTY(EditAnywhere, Category = "Sprites|Received")
+	class UPaperSprite* receivedNeutralSprite;
+	UPROPERTY(EditAnywhere, Category = "Sprites|Received")
+	class UPaperSprite* receivedAnnoyedSprite;
+	UPROPERTY(EditAnywhere, Category = "Sprites|Received")
+	class UPaperSprite* receivedAngrySprite;
+
+	UPROPERTY(EditAnywhere, Category = "Patience") float patience = 100.f;
+	UPROPERTY(EditAnywhere, Category = "Patience") float patienceLossPerStep = 10.f;
+	UPROPERTY(EditAnywhere, Category = "Patience") float stepInterval = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Patience") float annoyedThreshold = 60.f;
+	UPROPERTY(EditAnywhere, Category = "Patience") float angryThreshold = 30.f;
+
+	void ReceiveDrink();
+	ECustomerState GetState() const { return currentState; }
+
+private:
+	ECustomerState currentState = ECustomerState::Neutral;
+	FTimerHandle patienceTimer;
+
+	void DecreasePatience();
+	void UpdateState();
+	void ApplyStateSprite();
 };
