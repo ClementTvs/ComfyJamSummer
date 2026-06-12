@@ -66,7 +66,7 @@ void ABlenderTop::pinaColadaDrink()
 
 void ABlenderTop::badDrink()
 {
-    drink = EDrinks::pinaColada;
+    drink = EDrinks::badDrink;
 }
 
 EDrinks ABlenderTop::getDrink()

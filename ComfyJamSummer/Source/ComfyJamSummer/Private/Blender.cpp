@@ -133,7 +133,6 @@ void ABlender::BlenderStart()
     }
     else
         blenderTopRef->badDrink();
-    UE_LOG(LogTemp, Warning, TEXT("TEST"));
     blenderTopRef->clearCurrentIngredients();
     isBlenderWorking = false;
 }
