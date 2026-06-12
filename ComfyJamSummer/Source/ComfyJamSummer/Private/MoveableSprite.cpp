@@ -25,6 +25,10 @@ AMoveableSprite::AMoveableSprite()
     hitBox->SetGenerateOverlapEvents(true);
 }
 
+UPaperSpriteComponent* AMoveableSprite::GetSprite() const
+{ 
+    return sprite;
+}
 // Called when the game starts or when spawned
 void AMoveableSprite::BeginPlay()
 {

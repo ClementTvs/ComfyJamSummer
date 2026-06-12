@@ -52,6 +52,11 @@ void AGlass::FillGlass()
         badDrinkSprite->SetVisibility(true);
     if (drink == EDrinks::pinaColada)
         pinaColadaSprite->SetVisibility(true);
+    if (pendingShaker)
+    {
+        pendingShaker->shakerOpenSprite->SetVisibility(false);
+        pendingShaker->GetSprite()->SetVisibility(true); 
+    }
 }
 
 void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
@@ -61,16 +66,23 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-    UE_LOG(LogTemp, Warning, TEXT("PAS BIZZARE"));
     if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false)
     {
-        UE_LOG(LogTemp, Warning, TEXT("SIUU"));
         pendingBlender = Cast<ABlenderTop>(OtherActor);
         drink = pendingBlender->getDrink();
 
         if (drink != EDrinks::noDrink)
             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
     }
+    else if (OtherActor && OtherActor->IsA(AChecker::StaticClass()) && isFill == false)
+    {
+        pendingShaker = Cast<AChecker>(OtherActor);
+        drink = pendingShaker->getDrink();
+
+        if (drink != EDrinks::noDrink)
+            GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+    }
+
 }
 
 void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
@@ -82,6 +94,11 @@ void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
     {
         GetWorld()->GetTimerManager().ClearTimer(glassTimer);
         pendingBlender = nullptr;
+    }
+    else if (OtherActor == pendingBlender)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(glassTimer);
+        pendingShaker  = nullptr;
     }
 }
 

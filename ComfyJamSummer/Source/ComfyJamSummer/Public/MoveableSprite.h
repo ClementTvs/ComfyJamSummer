@@ -33,5 +33,6 @@ class COMFYJAMSUMMER_API AMoveableSprite : public AActor
 	public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UPaperSpriteComponent* GetSprite() const;
 
 };
