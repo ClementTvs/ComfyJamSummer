@@ -31,10 +31,12 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 		FVector GrabOffset;
 
 		bool isDragging = false;
-
+		bool isDraggingShaker = false;
 		void OnClickPressed();
 		void OnClickReleased();
 	
 	public:
 		bool getIsDragging() const;
+		bool getIsDraggingShaker() const;
+
 };

@@ -2,7 +2,11 @@
 #include "Alien.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperZDAnimationComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerHealth.h"
 #include "TimerManager.h"
+
+class APlayerHealth;
 
 AAlien::AAlien()
 {
@@ -50,6 +54,9 @@ void AAlien::OnPlayerCaught()
 {
 	State = EAlienState::Idle;
 	UE_LOG(LogTemp, Warning, TEXT("Player caught"));
+    APlayerHealth* playerHealth = Cast<APlayerHealth>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerHealth::StaticClass()));
+
+	playerHealth->LoseLife();
 }
 
 void AAlien::Tick(float DeltaTime)

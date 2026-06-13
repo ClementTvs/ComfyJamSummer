@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyPlayerController.h"
+#include "Shaker.h"
 #include "Ingredients.h"
 
 void AMyPlayerController::BeginPlay()
@@ -30,6 +31,8 @@ void AMyPlayerController::OnClickPressed()
 
     if (!Hit.GetActor()->IsA(ABlenderTop::StaticClass()))
         isDragging = true;
+    if (!Hit.GetActor()->IsA(AShaker::StaticClass()))
+        isDraggingShaker = true;
     if (Hit.GetActor())
     {
         SelectedActor = Hit.GetActor();
@@ -60,6 +63,11 @@ bool AMyPlayerController::getIsDragging() const
     return isDragging;
 }
 
+bool AMyPlayerController::getIsDraggingShaker() const
+{
+    return isDraggingShaker;
+}
+
 void AMyPlayerController::OnClickReleased()
 {
 	if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
@@ -73,6 +81,7 @@ void AMyPlayerController::OnClickReleased()
     }
     SelectedActor = nullptr;
     isDragging = false;
+    isDraggingShaker = false;
 }
 
 void AMyPlayerController::Tick(float DeltaTime)

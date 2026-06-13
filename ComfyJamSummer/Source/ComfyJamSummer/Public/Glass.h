@@ -7,9 +7,13 @@
 #include "Ingredients.h"
 #include "BlenderTop.h"
 #include "Drinks.h"
+#include "Shaker.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
 #include "Glass.generated.h"
+
+class AShaker;
+class ABlenderTop;
 
 /**
  * 
@@ -23,6 +27,7 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 
 	EDrinks drink = EDrinks::noDrink;
 	ABlenderTop *pendingBlender = nullptr;
+	AShaker *pendingShaker = nullptr;
 	FTimerHandle glassTimer;
 	float timerDuration;
 	bool isFill = false;
@@ -53,13 +58,19 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	void BeginPlay();
 	virtual void Tick(float DeltaTime) override;
 
-	EDrinks getDrink() const;
+	EDrinks getDrink();
 	
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent *fillHitBox;
 
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	FVector spawnLocation;
+
 	UPROPERTY(VisibleAnywhere)
 	UPaperSpriteComponent* pinaColadaSprite;
+	
+	UPROPERTY(EditAnywhere, Category="Spawn")
+	TSubclassOf<AGlass> glassClass;
 
 	UPROPERTY(VisibleAnywhere)
 	UPaperSpriteComponent* badDrinkSprite;

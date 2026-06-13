@@ -4,29 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "MoveableSprite.h"
-#include "IngredientsTypes.h"
-#include "Ingredients.h"
 #include "Drinks.h"
-#include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
-#include "BlenderTop.generated.h"
+#include "IngredientsTypes.h"
+#include "MyPlayerController.h"
+#include "Ingredients.h"
+#include "Shaker.generated.h"
 
+
+class AIngredients;
 /**
  * 
  */
 UCLASS()
-class COMFYJAMSUMMER_API ABlenderTop : public AMoveableSprite
+class COMFYJAMSUMMER_API AShaker : public AMoveableSprite
 {
 	GENERATED_BODY()
 	
 	private:
 
-	UPROPERTY()
 	TArray<EIngredientsTypes> currentIngredients;
+	EDrinks drink = EDrinks::noDrink;
 	AIngredients *pendingIngredient = nullptr;
 	FTimerHandle IngredientTimer;
-	EDrinks drink = EDrinks::noDrink;
+	float timerDuration;
+	float ShakePower = 0.f;
+	FVector2D LastMousePos;
+	AMyPlayerController* pc;
+	bool canShake = false;
 
 	UFUNCTION()
 	void OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
@@ -41,31 +47,30 @@ class COMFYJAMSUMMER_API ABlenderTop : public AMoveableSprite
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex);
-
-	UFUNCTION()
+	
 	void ValidateIngredient();
+	void makeDrink();
+	bool ContainsRecipe(const TArray<EIngredientsTypes>& recipe);
 
 	public :
 
+	AShaker();
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
-	void setDrink(EDrinks newDrink);
-	EDrinks getDrink() const;
 	void resetDrink();
 
-	ABlenderTop();
-	UPROPERTY(VisibleAnywhere)
-	UBoxComponent *fillHitBox;
+	EDrinks getDrink() const;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> timerWidgetClass;
 
-	float timerDuration;
+	UPROPERTY(VisibleAnywhere)
+	UPaperSpriteComponent* shakerOpenSprite;
 
 	UPROPERTY()
 	UWidgetComponent* timerWidgetInstance;
 
-	const TArray<EIngredientsTypes>& getCurrentIngredients() const;
-	void clearCurrentIngredients();
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent *fillHitBox;
 };
