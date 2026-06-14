@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MyPlayerController.h"
 #include "Shaker.h"
 #include "Ingredients.h"
@@ -35,31 +34,28 @@ void AMyPlayerController::OnClickPressed()
     if (!Hit.GetActor()->IsA(AShaker::StaticClass()))
         isDraggingShaker = true;
     if (Hit.GetActor())
-	{
-		if (Hit.GetComponent()->GetName() == TEXT("HitBox"))
-		{
-            if (Hit.GetActor()->IsA(ABlenderTop::StaticClass()))
+    {
+        SelectedActor = Hit.GetActor();
+
+        if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
+        {
+            Ingredient->OnGrabbed();
+        }
+        if (SelectedActor->IsA(ABlenderTop::StaticClass()))
+        {
+            ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
+            if (blender->IsBlenderFusion())
             {
-                ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
-                if (blender->IsBlenderFusion())
-                {
-                    blender->isBlenderFusionFalse();
-                }
+                blender->isBlenderFusionFalse();
             }
+        }
 
-			if (!Hit.GetActor()->IsA(ABlender::StaticClass()))
-                SelectedActor = Hit.GetActor();
-            else
+		if (SelectedActor->IsA(ABlender::StaticClass()))
                 return ;
-			if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
-				Ingredient->OnGrabbed();
-
-			FVector WorldLocation, WorldDirection;
-			if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
-				GrabOffset = SelectedActor->GetActorLocation() - WorldLocation;
-
-		}
-	}
+        FVector WorldLocation, WorldDirection;
+        if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
+            GrabOffset = SelectedActor->GetActorLocation() - WorldLocation;
+    }
 }
 
 bool AMyPlayerController::getIsDragging() const

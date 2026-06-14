@@ -117,9 +117,9 @@ void AShaker::makeDrink()
 {
     TArray<EIngredientsTypes> pinaColadaRecipe =
     {
-        EIngredientsTypes::ananas,
-        EIngredientsTypes::rhum,
-        EIngredientsTypes::cocoMilk
+        EIngredientsTypes::pineapple,
+        EIngredientsTypes::rum,
+        EIngredientsTypes::cocoJuice
     };
 
     if (ContainsRecipe(pinaColadaRecipe))

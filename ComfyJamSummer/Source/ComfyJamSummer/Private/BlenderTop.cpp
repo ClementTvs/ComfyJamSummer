@@ -62,14 +62,9 @@ void ABlenderTop::resetDrink()
     drink = EDrinks::noDrink;
 }
 
-void ABlenderTop::pinaColadaDrink()
+void ABlenderTop::setDrink(EDrinks newDrink)
 {
-    drink = EDrinks::pinaColada;
-}
-
-void ABlenderTop::badDrink()
-{
-    drink = EDrinks::badDrink;
+	drink = newDrink;
 }
 
 EDrinks ABlenderTop::getDrink() const

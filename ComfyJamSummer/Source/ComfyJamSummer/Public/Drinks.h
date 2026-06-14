@@ -5,7 +5,9 @@
 UENUM()
 enum class EDrinks: uint8
 {
-    noDrink,
+	daiquiri,
+	margarita,
     pinaColada,
+    noDrink,
     badDrink
 };

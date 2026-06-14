@@ -120,19 +120,23 @@ bool ABlender::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
 
 void ABlender::BlenderStart()
 {
-    TArray<EIngredientsTypes> pinaColadaRecipe =
+    static const TMap<EDrinks, TArray<EIngredientsTypes>> Recipes =
     {
-        EIngredientsTypes::ananas,
-        EIngredientsTypes::rhum,
-        EIngredientsTypes::cocoMilk
+        { EDrinks::daiquiri,   { EIngredientsTypes::rum,    EIngredientsTypes::limeJuice, EIngredientsTypes::sugarSyrup } },
+        { EDrinks::margarita,  { EIngredientsTypes::tequila, EIngredientsTypes::limeJuice, EIngredientsTypes::orangeLiqueur } },
     };
 
-    if (ContainsRecipe(pinaColadaRecipe))
+    EDrinks result = EDrinks::badDrink;
+    for (const TPair<EDrinks, TArray<EIngredientsTypes>>& R : Recipes)
     {
-        blenderTopRef->pinaColadaDrink();
+        if (ContainsRecipe(R.Value))
+        {
+            result = R.Key;
+            break;
+        }
     }
-    else
-        blenderTopRef->badDrink();
+
+    blenderTopRef->setDrink(result);
     blenderTopRef->clearCurrentIngredients();
     isBlenderWorking = false;
 }
@@ -175,7 +179,7 @@ void ABlender::FusionBlender()
         return ;
     
     FVector blenderTopLocation = GetActorLocation();
-    blenderTopLocation.Z += 1.5;  // changer la position de blenderTop
+    blenderTopLocation.Z += 5;  // changer la position de blenderTop
     blenderTop->SetActorLocation(blenderTopLocation);
 }
 
