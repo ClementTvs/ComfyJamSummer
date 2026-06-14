@@ -21,8 +21,15 @@ class COMFYJAMSUMMER_API ACustomer : public AActor
 {
     GENERATED_BODY()
 
-public:
-    ACustomer();
+private:
+    bool isOverCustomer = false;
+
+    UFUNCTION()
+    void OnGlassLeaveCustomer(
+        UPrimitiveComponent* OverlappedComp,
+        AActor* OtherActor,
+        UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex);
 
 protected:
     virtual void BeginPlay() override;
@@ -33,6 +40,11 @@ protected:
         bool bFromSweep, const FHitResult& SweepResult);
 
 public:
+    ACustomer();
+
+    void SellDrink();
+    bool getIsOverCustomer() const;
+
     UPROPERTY(VisibleAnywhere)
     class UPaperSpriteComponent* spriteComp;
 

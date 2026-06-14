@@ -3,6 +3,8 @@
 #include "PaperSpriteComponent.h"
 #include "PaperSprite.h"
 #include "Components/BoxComponent.h"
+#include "PlayerHealth.h"
+#include "Glass.h"
 #include "TimerManager.h"
 #include "Glass.h"
 
@@ -38,9 +40,28 @@ void ACustomer::BeginPlay()
     PickRandomOrder();
 
     serveHitBox->OnComponentBeginOverlap.AddDynamic(this, &ACustomer::OnGlassOverlap);
+    serveHitBox->OnComponentEndOverlap.AddDynamic(this, &ACustomer::OnGlassLeaveCustomer);
+
 
     GetWorldTimerManager().SetTimer(patienceTimer, this,
         &ACustomer::DecreasePatience, stepInterval, true);
+}
+
+bool ACustomer::getIsOverCustomer() const
+{
+    return isOverCustomer;
+}
+
+void ACustomer::OnGlassLeaveCustomer(
+    UPrimitiveComponent* OverlappedComp,
+    AActor* OtherActor,
+    UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex)
+{
+    if (Cast<AGlass>(OtherActor))
+    {
+        isOverCustomer = false;
+    }
 }
 
 void ACustomer::PickRandomOrder()
@@ -68,6 +89,28 @@ void ACustomer::OnGlassOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
     if (!glass)
         return;
 
+    isOverCustomer = true;
+    // if (glass->getDrink() == desiredDrink)
+    // {
+    //     UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi !"));
+    //     ReceiveDrink();
+    //     glass->Destroy();
+	// 	GetWorld()->SpawnActor<AGlass>(glassClass, spawnLocation, FRotator::ZeroRotator);
+    // }
+    // else
+    // {
+    //     UE_LOG(LogTemp, Warning, TEXT("Mauvais cocktail (voulu=%d, recu=%d)"),
+    //         (int)desiredDrink, (int)glass->getDrink());
+	// 	ReceivedWrongDrink();
+	// 	GetWorld()->SpawnActor<AGlass>(glassClass, spawnLocation, FRotator::ZeroRotator);
+	// 	glass->Destroy();
+    // }
+}
+
+void ACustomer::SellDrink()
+{
+    AGlass* glass = Cast<AGlass>(UGameplayStatics::GetActorOfClass(GetWorld(), AGlass::StaticClass()));
+
     if (glass->getDrink() == desiredDrink)
     {
         UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi !"));
@@ -85,6 +128,7 @@ void ACustomer::OnGlassOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
     }
 }
 
+
 void ACustomer::DecreasePatience()
 {
     patience = FMath::Max(0.f, patience - patienceLossPerStep);
@@ -100,6 +144,9 @@ void ACustomer::DecreasePatience()
 
 		if (orderComp)
 			orderComp->SetVisibility(false);
+
+        APlayerHealth* playerHealth = Cast<APlayerHealth>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerHealth::StaticClass()));
+	    playerHealth->LoseLife();
 
 		StartLeaveTimer();
 	}
@@ -163,6 +210,10 @@ void ACustomer::ReceiveDrink()
 
 void ACustomer::ReceivedWrongDrink()
 {
+
+    APlayerHealth* playerHealth = Cast<APlayerHealth>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerHealth::StaticClass()));
+	playerHealth->LoseLife();
+
     GetWorldTimerManager().ClearTimer(patienceTimer);
 
     currentState = ECustomerState::Served;

@@ -2,6 +2,8 @@
 
 #include "MyPlayerController.h"
 #include "Shaker.h"
+#include "Customer.h"
+#include "Glass.h"
 #include "Ingredients.h"
 
 void AMyPlayerController::BeginPlay()
@@ -77,6 +79,23 @@ void AMyPlayerController::OnClickReleased()
         if (blender->IsOverBlender())
         {
             blender->FusionBlender();
+        }
+    }
+
+    AGlass* glass = Cast<AGlass>(SelectedActor);
+    if (glass) 
+    {
+        TArray<AActor*> allCustomers;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACustomer::StaticClass(), allCustomers);
+
+        for (AActor* actor : allCustomers)
+        {
+            ACustomer* customer = Cast<ACustomer>(actor);
+            if (customer && customer->getIsOverCustomer())
+            {
+                customer->SellDrink();
+                break;
+            }
         }
     }
     SelectedActor = nullptr;
