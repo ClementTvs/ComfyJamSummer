@@ -58,7 +58,7 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	void BeginPlay();
 	virtual void Tick(float DeltaTime) override;
 
-	EDrinks getDrink();
+	EDrinks getDrink() const;
 	
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent *fillHitBox;
