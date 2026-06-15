@@ -38,6 +38,7 @@ void AMyPlayerController::OnClickPressed()
     if (Hit.GetActor())
     {
         SelectedActor = Hit.GetActor();
+        initialLocation = SelectedActor->GetActorLocation();
 
         if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
         {
@@ -98,6 +99,14 @@ void AMyPlayerController::OnClickReleased()
             }
         }
     }
+
+    if (SelectedActor)
+    {
+        FVector Loc = SelectedActor->GetActorLocation();
+        if (Loc.X < minX || Loc.X > maxX || Loc.Z < minZ || Loc.Z > maxZ)
+            SelectedActor->SetActorLocation(initialLocation);
+    }
+
     SelectedActor = nullptr;
     isDragging = false;
     isDraggingShaker = false;

@@ -30,12 +30,25 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 		AActor* SelectedActor;
 		FVector GrabOffset;
 
+		FVector initialLocation;
+
 		bool isDragging = false;
 		bool isDraggingShaker = false;
 		void OnClickPressed();
 		void OnClickReleased();
 	
 	public:
+
+
+		UPROPERTY(EditAnywhere, Category = "Bounds")
+		float minX;
+		UPROPERTY(EditAnywhere, Category = "Bounds")
+		float maxX;
+		UPROPERTY(EditAnywhere, Category = "Bounds")
+		float minZ;
+		UPROPERTY(EditAnywhere, Category = "Bounds")
+		float maxZ;
+
 		bool getIsDragging() const;
 		bool getIsDraggingShaker() const;
 
