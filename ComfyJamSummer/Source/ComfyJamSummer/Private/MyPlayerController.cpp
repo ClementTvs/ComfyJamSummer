@@ -14,6 +14,12 @@ void AMyPlayerController::BeginPlay()
     bEnableClickEvents = true;
     bEnableMouseOverEvents = true;
     EnableInput(this);
+
+    UE_LOG(LogTemp, Warning, TEXT("OUII"));
+    FInputModeGameAndUI InputMode;
+    InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+    InputMode.SetHideCursorDuringCapture(false);
+    SetInputMode(InputMode);
 }
 
 void AMyPlayerController::SetupInputComponent()
@@ -31,6 +37,8 @@ void AMyPlayerController::OnClickPressed()
     FHitResult Hit;
     GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
+    if (!Hit.GetActor())
+        return;
     if (!Hit.GetActor()->IsA(ABlenderTop::StaticClass()))
         isDragging = true;
     if (!Hit.GetActor()->IsA(AShaker::StaticClass()))
