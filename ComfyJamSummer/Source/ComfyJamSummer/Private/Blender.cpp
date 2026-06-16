@@ -179,7 +179,7 @@ void ABlender::FusionBlender()
         return ;
     
     FVector blenderTopLocation = GetActorLocation();
-    blenderTopLocation.Z += 5;  // changer la position de blenderTop
+    blenderTopLocation.Z += 31;
     blenderTop->SetActorLocation(blenderTopLocation);
 }
 
