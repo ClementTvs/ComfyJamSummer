@@ -29,11 +29,6 @@ ABlender::ABlender()
     hitBox->OnComponentBeginOverlap.AddDynamic(this, &ABlender::OnTopEnter);
     hitBox->OnComponentEndOverlap.AddDynamic(this, &ABlender::OnTopLeaveBottom);
 
-    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
-    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, -25.f));
-    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
-    timerWidgetInstance->SetWorldScale3D(FVector(0.07f, 0.07f, 0.07f));
-    timerWidgetInstance->SetWorldRotation(FRotator(0.f, -90.f, 0.f)); 
 }
 
 void ABlender::BeginPlay()
@@ -43,6 +38,12 @@ void ABlender::BeginPlay()
     blenderTopRef = Cast<ABlenderTop>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlenderTop::StaticClass()));
     isBlenderFusion = true;
     UE_LOG(LogTemp, Warning, TEXT("SIU"));
+
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
+    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, -25.f));
+    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
+    timerWidgetInstance->SetWorldScale3D(FVector(0.07f, 0.07f, 0.07f));
+    timerWidgetInstance->SetWorldRotation(FRotator(0.f, -90.f, 0.f)); 
 
     timerWidgetInstance->SetWidgetClass(timerWidgetClass);
 }

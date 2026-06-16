@@ -29,12 +29,6 @@ AGlass::AGlass()
     fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGlass::OnBlenderOverlap);
     fillHitBox->OnComponentEndOverlap.AddDynamic(this, &AGlass::OnBlenderEndOverlap);
 
-    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
-    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
-    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
-    timerWidgetInstance->SetWorldScale3D(FVector(0.07f, 0.07f, 0.07f));
-    timerWidgetInstance->SetWorldRotation(FRotator(0.f, -90.f, 0.f));
-
     timerDuration = 2.0f;
     isFill = false;
 }
@@ -42,6 +36,12 @@ AGlass::AGlass()
 void AGlass::BeginPlay()
 {
     Super::BeginPlay();
+
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
+    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
+    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
+    timerWidgetInstance->SetWorldScale3D(FVector(0.07f, 0.07f, 0.07f));
+    timerWidgetInstance->SetWorldRotation(FRotator(0.f, -90.f, 0.f));
 
     timerWidgetInstance->SetWidgetClass(timerWidgetClass);
     pinaColadaSprite->SetVisibility(false);
