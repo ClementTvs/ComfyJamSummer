@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
+#include "Components/AudioComponent.h"
 #include "MainMenu.generated.h"
 
 /**
@@ -32,4 +33,7 @@ class COMFYJAMSUMMER_API UMainMenu : public UUserWidget
 
 		UFUNCTION()
 		void OnQuitClicked();
+
+		UPROPERTY(EditAnywhere)
+		UAudioComponent* MusicComponent;
 };

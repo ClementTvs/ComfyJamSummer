@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "MyGameInstance.h"
 #include "Components/Image.h"
 #include "SliderBar.generated.h"
 

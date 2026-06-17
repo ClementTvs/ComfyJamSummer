@@ -62,4 +62,7 @@ void USliderBar::UpdateHandleFromValue()
         float NewX = FMath::Clamp(sliderValue * BarSize.X - HandleSize.X / 2.f, 0.f, BarSize.X - HandleSize.X);
         HandleSlot->SetPosition(FVector2D(NewX, HandleSlot->GetPosition().Y));
     }
+    UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
+    if (GI)
+        GI->SetVolume(sliderValue);
 }
