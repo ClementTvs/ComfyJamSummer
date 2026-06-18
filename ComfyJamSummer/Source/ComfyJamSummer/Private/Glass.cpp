@@ -97,21 +97,25 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
 {
     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 
-    if (!pc->getIsDraggingShaker())
-        return ;
+    UE_LOG(LogTemp, Warning, TEXT("MOAUIS"));
 
-    if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false)
+
+    UE_LOG(LogTemp, Warning, TEXT("OUI"));
+    if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
     {
         pendingBlender = Cast<ABlenderTop>(OtherActor);
         drink = pendingBlender->getDrink();
 
+        UE_LOG(LogTemp, Warning, TEXT("IN"));
+
         if (pendingBlender->getDrink() == EDrinks::noDrink)
             return ;
+        UE_LOG(LogTemp, Warning, TEXT("SIU"));
         pendingBlender->StartPouring();
         if (drink != EDrinks::noDrink)
             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
     }
-    else if (OtherActor && OtherActor->IsA(AShaker::StaticClass()) && isFill == false)
+    else if (OtherActor && OtherActor->IsA(AShaker::StaticClass()) && isFill == false && pc->getIsDraggingShaker())
     {
         pendingShaker = Cast<AShaker>(OtherActor);
         drink = pendingShaker->getDrink();
