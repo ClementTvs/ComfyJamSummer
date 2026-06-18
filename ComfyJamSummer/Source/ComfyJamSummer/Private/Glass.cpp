@@ -16,7 +16,6 @@ AGlass::AGlass()
     daiquiriSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSpriteGasoline"));
 	margaritaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("MargaritaSpriteGasoline"));
     pinaColadaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PinaColadaSpriteGasoline"));
-    badDrinkSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("BadDrinkSpriteGasoline"));
 	straightGasolineSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("StraightGasolineSprite"));
     timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
 
@@ -90,13 +89,7 @@ void AGlass::FillGlass()
 		default: 
 			break;
     }
-	
-    if (pendingBlender)
-        pendingBlender->setDrink(EDrinks::noDrink);
-    if (drink == EDrinks::badDrink)
-        badDrinkSprite->SetVisibility(true);
-    if (drink == EDrinks::pinaColada)
-        pinaColadaSprite->SetVisibility(true);
+
     if (pendingShaker)
     {
         pendingShaker->resetDrink();
@@ -107,7 +100,7 @@ void AGlass::FillGlass()
     else if (pendingBlender)
 	{
         pendingBlender->resetDrink();
-		pendingShaker->StopPouring();
+		pendingBlender->StopPouring();
 	}
 }
 
@@ -189,6 +182,7 @@ void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
     }
 	else if (OtherActor == pendingIngredient)
 	{
+
         pendingIngredient->StopPouring();
 		GetWorld()->GetTimerManager().ClearTimer(glassTimer);
 		pendingIngredient = nullptr;

@@ -54,7 +54,6 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 
 	void StartPourSound();
 	void StopPourSound();
-
 	public:
 
 	AGlass();
