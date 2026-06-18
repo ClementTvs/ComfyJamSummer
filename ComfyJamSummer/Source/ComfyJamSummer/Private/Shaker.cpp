@@ -128,6 +128,13 @@ void AShaker::makeDrink()
         EIngredientsTypes::blue
     };
 
+    TArray<EIngredientsTypes> pinaColadaGasolineRecipe =
+    {
+        EIngredientsTypes::yellow,
+        EIngredientsTypes::blue,
+        EIngredientsTypes::gasoline
+    };
+
     TArray<EIngredientsTypes> straightGasoline =
     {
         EIngredientsTypes::gasoline
@@ -139,6 +146,8 @@ void AShaker::makeDrink()
     }
 	else if (ContainsRecipe(straightGasoline))
 		drink = EDrinks::gasoline;
+    else if (ContainsRecipe(pinaColadaGasolineRecipe))
+		drink = EDrinks::pinaColadaG;
     else
         drink = EDrinks::badDrink;
     currentIngredients.Empty();

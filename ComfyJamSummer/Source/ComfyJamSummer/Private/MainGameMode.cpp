@@ -24,6 +24,28 @@ void AMainGameMode::OnDrinkSold()
         AlienEnd();
 }
 
+void AMainGameMode::OnDrinkGasolineSold()
+{
+    drinksGasolineSold++;
+
+    if (drinksGasolineSold >= 10)
+        GoodEnd();
+}
+
+void AMainGameMode::GoodEnd()
+{
+    if (goodEndingScreen)
+    {
+        UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), goodEndingScreen);
+        EndScreen->AddToViewport();
+        UGameplayStatics::SetGamePaused(this, true);
+        
+        UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
+        if (GI)
+            GI->PlayMusic(GI->goodEndingMusic);
+    }
+}
+
 void AMainGameMode::AlienEnd()
 {
     if (alienEndingScreen)

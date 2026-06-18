@@ -150,7 +150,7 @@ void ABlenderTop::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-        if (isPouring)
+    if (isPouring)
     {
         TArray<AActor*> overlappingActors;
         GetOverlappingActors(overlappingActors);

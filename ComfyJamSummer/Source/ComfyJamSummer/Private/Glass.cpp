@@ -13,6 +13,10 @@ AGlass::AGlass()
 	daiquiriSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSprite"));
 	margaritaSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("margaritaSprite"));
     badDrinkSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("BadDrinkSprite"));
+    daiquiriSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSpriteGasoline"));
+	margaritaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("MargaritaSpriteGasoline"));
+    pinaColadaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PinaColadaSpriteGasoline"));
+    badDrinkSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("BadDrinkSpriteGasoline"));
 	straightGasolineSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("StraightGasolineSprite"));
     timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
 
@@ -20,6 +24,9 @@ AGlass::AGlass()
     badDrinkSprite->SetupAttachment(root);
     pinaColadaSprite->SetupAttachment(root);
     margaritaSprite->SetupAttachment(root);
+    daiquiriSpriteGasoline->SetupAttachment(root);
+    margaritaSpriteGasoline->SetupAttachment(root);
+    pinaColadaSpriteGasoline->SetupAttachment(root);
     daiquiriSprite->SetupAttachment(root);
 	straightGasolineSprite->SetupAttachment(root);
     timerWidgetInstance->SetupAttachment(root);
@@ -65,6 +72,15 @@ void AGlass::FillGlass()
 		case EDrinks::margarita:
 			margaritaSprite->SetVisibility(true);
 			break;
+        case EDrinks::pinaColadaG:
+			pinaColadaSpriteGasoline->SetVisibility(true);
+			break;
+        case EDrinks::daiquiriG:
+			daiquiriSpriteGasoline->SetVisibility(true);
+			break;
+		case EDrinks::margaritaG:
+			margaritaSpriteGasoline->SetVisibility(true);
+			break;
 		case EDrinks::badDrink:
 			badDrinkSprite->SetVisibility(true);
 			break;
@@ -104,20 +120,16 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
 {
     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 
-    UE_LOG(LogTemp, Warning, TEXT("MOAUIS"));
 
 
-    UE_LOG(LogTemp, Warning, TEXT("OUI"));
     if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
     {
         pendingBlender = Cast<ABlenderTop>(OtherActor);
         drink = pendingBlender->getDrink();
 
-        UE_LOG(LogTemp, Warning, TEXT("IN"));
 
         if (pendingBlender->getDrink() == EDrinks::noDrink)
             return ;
-        UE_LOG(LogTemp, Warning, TEXT("SIU"));
         pendingBlender->StartPouring();
         if (drink != EDrinks::noDrink)
 		{
@@ -147,7 +159,9 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
         if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
         {
             pendingIngredient = ingredient;
+
             drink = EDrinks::gasoline;
+            pendingIngredient->StartPouring(false);
             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
 			StartPourSound();
         }
@@ -175,6 +189,7 @@ void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
     }
 	else if (OtherActor == pendingIngredient)
 	{
+        pendingIngredient->StopPouring();
 		GetWorld()->GetTimerManager().ClearTimer(glassTimer);
 		pendingIngredient = nullptr;
 		StopPourSound();
@@ -185,7 +200,6 @@ EDrinks AGlass::getDrink() const
 {
     return drink;
 }
-
 
 void AGlass::Tick(float DeltaTime)
 {
