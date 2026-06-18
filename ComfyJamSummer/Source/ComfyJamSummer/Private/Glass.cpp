@@ -13,6 +13,10 @@ AGlass::AGlass()
 	daiquiriSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSprite"));
 	margaritaSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("margaritaSprite"));
     badDrinkSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("BadDrinkSprite"));
+    daiquiriSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSpriteGasoline"));
+	margaritaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("MargaritaSpriteGasoline"));
+    pinaColadaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PinaColadaSpriteGasoline"));
+    badDrinkSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("BadDrinkSpriteGasoline"));
 	straightGasolineSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("StraightGasolineSprite"));
     timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
 
@@ -20,6 +24,9 @@ AGlass::AGlass()
     badDrinkSprite->SetupAttachment(root);
     pinaColadaSprite->SetupAttachment(root);
     margaritaSprite->SetupAttachment(root);
+    daiquiriSpriteGasoline->SetupAttachment(root);
+    margaritaSpriteGasoline->SetupAttachment(root);
+    pinaColadaSpriteGasoline->SetupAttachment(root);
     daiquiriSprite->SetupAttachment(root);
 	straightGasolineSprite->SetupAttachment(root);
     timerWidgetInstance->SetupAttachment(root);
@@ -65,15 +72,22 @@ void AGlass::FillGlass()
 		case EDrinks::margarita:
 			margaritaSprite->SetVisibility(true);
 			break;
+        case EDrinks::pinaColadaG:
+			pinaColadaSpriteGasoline->SetVisibility(true);
+			break;
+        case EDrinks::daiquiriG:
+			daiquiriSpriteGasoline->SetVisibility(true);
+			break;
+		case EDrinks::margaritaG:
+			margaritaSpriteGasoline->SetVisibility(true);
+			break;
 		case EDrinks::badDrink:
 			badDrinkSprite->SetVisibility(true);
 			break;
 		case EDrinks::gasoline:
-            UE_LOG(LogTemp, Warning, TEXT("Gasoline"));
 			straightGasolineSprite->SetVisibility(true);
 			break;
 		default: 
-            UE_LOG(LogTemp, Warning, TEXT("DEFAULT"));
 			break;
     }
 	

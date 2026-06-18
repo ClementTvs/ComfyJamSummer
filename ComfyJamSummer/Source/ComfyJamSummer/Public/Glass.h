@@ -70,9 +70,7 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	FVector spawnLocation;
 
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* pinaColadaSprite;
-	
+
 	UPROPERTY(EditAnywhere, Category="Spawn")
 	TSubclassOf<AGlass> glassClass;
 
@@ -80,10 +78,22 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	UPaperSpriteComponent* badDrinkSprite;
 
 	UPROPERTY(VisibleAnywhere)
+	UPaperSpriteComponent* pinaColadaSprite;
+
+	UPROPERTY(VisibleAnywhere)
 	UPaperSpriteComponent* daiquiriSprite;
 
 	UPROPERTY(VisibleAnywhere)
 	UPaperSpriteComponent* margaritaSprite;
+
+	UPROPERTY(VisibleAnywhere)
+	UPaperSpriteComponent* daiquiriSpriteGasoline;
+
+	UPROPERTY(VisibleAnywhere)
+	UPaperSpriteComponent* margaritaSpriteGasoline;
+	
+	UPROPERTY(VisibleAnywhere)
+	UPaperSpriteComponent* pinaColadaSpriteGasoline;
 
 	UPROPERTY(VisibleAnywhere)
 	UPaperSpriteComponent* straightGasolineSprite;

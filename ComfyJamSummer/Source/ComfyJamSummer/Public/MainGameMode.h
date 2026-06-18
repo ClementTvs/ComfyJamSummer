@@ -20,9 +20,13 @@ class COMFYJAMSUMMER_API AMainGameMode : public AGameModeBase
 		virtual void BeginPlay() override;
 
 		void OnDrinkSold();
+		void OnDrinkGasolineSold();
 
 		UPROPERTY(EditAnywhere, Category = "UI")
 		TSubclassOf<UUserWidget> alienEndingScreen;
+
+		UPROPERTY(EditAnywhere, Category = "UI")
+		TSubclassOf<UUserWidget> goodEndingScreen;
 
 	private:
 
@@ -30,7 +34,9 @@ class COMFYJAMSUMMER_API AMainGameMode : public AGameModeBase
 		ABackgroundActor* BackgroundActorRef;
 
 		int8 drinksSold = 0;
+		int8 drinksGasolineSold = 0;
 
 		void AlienEnd();
+		void GoodEnd();
 
 };

@@ -97,7 +97,8 @@ void ACustomer::OnGlassOverlap(UPrimitiveComponent* OverlappedComp, AActor* Othe
 void ACustomer::SellDrink()
 {
     AGlass* glass = Cast<AGlass>(UGameplayStatics::GetActorOfClass(GetWorld(), AGlass::StaticClass()));
-	if (!glass)
+    AMainGameMode* GM = Cast<AMainGameMode>(GetWorld()->GetAuthGameMode());
+	if (!glass || !GM)
 		return;
 
     if (glass->getDrink() == EDrinks::gasoline)
@@ -110,12 +111,23 @@ void ACustomer::SellDrink()
         return;
     }
 
+    if (desiredDrink == EDrinks::pinaColada && glass->getDrink() == EDrinks::pinaColadaG
+        || desiredDrink == EDrinks::margarita && glass->getDrink() == EDrinks::margaritaG
+        || desiredDrink == EDrinks::daiquiri && glass->getDrink() == EDrinks::daiquiriG)
+    {
+        GM->OnDrinkGasolineSold();
+        UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi !"));
+        ReceiveDrink();
+        glass->Destroy();
+		GetWorld()->SpawnActor<AGlass>(glassClass, spawnLocation, FRotator::ZeroRotator);
+    }
+
+
     if (glass->getDrink() == desiredDrink)
     {
-        AMainGameMode* GM = Cast<AMainGameMode>(GetWorld()->GetAuthGameMode());
-        if (GM)
-            GM->OnDrinkSold();
-        UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi !"));
+
+        GM->OnDrinkSold();
+        UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi ALIEN !"));
         ReceiveDrink();
         glass->Destroy();
 		GetWorld()->SpawnActor<AGlass>(glassClass, spawnLocation, FRotator::ZeroRotator);

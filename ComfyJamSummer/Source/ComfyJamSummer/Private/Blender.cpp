@@ -122,6 +122,8 @@ void ABlender::BlenderStart()
     {
         { EDrinks::daiquiri,   { EIngredientsTypes::red, EIngredientsTypes::yellow } },
         { EDrinks::margarita,  { EIngredientsTypes::red, EIngredientsTypes::blue } },
+        { EDrinks::daiquiriG,   { EIngredientsTypes::red, EIngredientsTypes::yellow, EIngredientsTypes::gasoline } },
+        { EDrinks::margaritaG,  { EIngredientsTypes::red, EIngredientsTypes::blue, EIngredientsTypes::gasoline } },
 		{ EDrinks::gasoline, { EIngredientsTypes::gasoline }}
     };
 

@@ -9,6 +9,9 @@ enum class EDrinks: uint8
 	daiquiri,
 	margarita,
     pinaColada,
+    daiquiriG,
+	margaritaG,
+    pinaColadaG,
     noDrink,
     badDrink
 };
