@@ -1,15 +1,32 @@
 // SliderBar.cpp
 #include "SliderBar.h"
 
+float USliderBar::sliderValue = 0.5f;
+
 void USliderBar::NativeConstruct()
 {
     Super::NativeConstruct();
-    FTimerHandle InitTimer;
-    GetWorld()->GetTimerManager().SetTimer(InitTimer, [this]()
-    {
-        UpdateHandleFromValue();
-    }, 0.1f, false);
+}
 
+void USliderBar::NativeOnInitialized()
+{
+    Super::NativeOnInitialized();
+    UpdateHandleFromValue();
+}
+
+void USliderBar::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+    Super::NativeTick(MyGeometry, InDeltaTime);
+    
+    if (!bInitialized)
+    {
+        FVector2D BarSize = SliderBar->GetCachedGeometry().GetLocalSize();
+        if (BarSize.X > 0) // géométrie prête !
+        {
+            UpdateHandleFromValue();
+            bInitialized = true;
+        }
+    }
 }
 
 FReply USliderBar::NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
@@ -53,6 +70,8 @@ void USliderBar::NativeOnMouseLeave(const FPointerEvent& MouseEvent)
 void USliderBar::UpdateHandleFromValue()
 {
     if (!SliderHandle || !SliderBar)
+        return;
+    if (!SliderHandle->IsValidLowLevel() || !SliderBar->IsValidLowLevel())
         return;
     UCanvasPanelSlot* HandleSlot = Cast<UCanvasPanelSlot>(SliderHandle->Slot);
     if (HandleSlot)

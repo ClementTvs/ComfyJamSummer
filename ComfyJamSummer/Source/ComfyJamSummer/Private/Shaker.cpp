@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "Glass.h"
 #include "Shaker.h"
 
 AShaker::AShaker()
@@ -40,6 +41,8 @@ void AShaker::BeginPlay()
 
 void AShaker::ValidateIngredient()
 {
+    if (!pendingIngredient)
+        return ;
     EIngredientsTypes ingredientType = pendingIngredient->getIngredientType();
 
     currentIngredients.Add(ingredientType);
@@ -57,7 +60,7 @@ void AShaker::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
     ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
 
     if (OtherComp->GetName() != TEXT("HitBox") || drink != EDrinks::noDrink || !pc->getIsDragging() || !pc->getIsDraggingShaker())
-        return;
+        return ;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
         AIngredients *ingredient = Cast<AIngredients>(OtherActor);
@@ -71,6 +74,8 @@ void AShaker::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
         }
         else
         {
+            bool isTiltLeft = ingredient->GetActorLocation().X > GetActorLocation().X;
+            ingredient->StartPouring(isTiltLeft);
             if (ingredientType == EIngredientsTypes::gasoline)
             {
                 UE_LOG(LogTemp, Warning, TEXT("PUTING GASOLINEEE..."));
@@ -94,6 +99,7 @@ void AShaker::OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
 {
     if (OtherActor == pendingIngredient)
     {
+        pendingIngredient->StopPouring();
         GetWorld()->GetTimerManager().ClearTimer(IngredientTimer);
         pendingIngredient = nullptr;
     }
@@ -147,11 +153,51 @@ void AShaker::resetDrink()
     drink = EDrinks::noDrink;
 }
 
+void AShaker::StartPouring(bool bShouldTiltLeft)
+{
+    SetActorRotation(FRotator(0.f, 0.f, 0.f)); 
+    isPouring = true;
+    this->bTiltLeft = bShouldTiltLeft;
+}
+
+void AShaker::StopPouring()
+{
+    isPouring = false;
+    SetActorRotation(FRotator(0.f, 0.f, 0.f));
+}
 
 void AShaker::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
  
+    if (isPouring)
+    {
+        TArray<AActor*> overlappingActors;
+        GetOverlappingActors(overlappingActors);
+        
+        bool stillOverlapping = false;
+        for (AActor* actor : overlappingActors)
+        {
+            if (actor->IsA(AGlass::StaticClass()))
+            {
+                stillOverlapping = true;
+                break;
+            }
+        }
+        if (!stillOverlapping)
+        {
+            StopPouring();
+            return;
+        }
+
+        FRotator CurrentRotation = GetActorRotation();
+        float TargetPitch = -70.f;
+        if (bTiltLeft)
+            TargetPitch = 70.f;
+        CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetPitch, DeltaTime, 3.f);
+        SetActorRotation(CurrentRotation);
+    }
+
     if (!currentIngredients.IsEmpty())
     {
         FVector2D CurrentMousePos;

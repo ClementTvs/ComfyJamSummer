@@ -2,12 +2,17 @@
 
 
 #include "MenuGameMode.h"
+#include "MyGameInstance.h"
 #include "MainMenu.h"
 
 void AMenuGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
+
+    UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
+    if (GI)
+        GI->PlayMusic(GI->menuMusic);
 
     if (!MenuClass)
     {

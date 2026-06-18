@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Drinks.h"
 #include "Glass.h"
 
 AGlass::AGlass()
@@ -102,6 +102,9 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
         pendingBlender = Cast<ABlenderTop>(OtherActor);
         drink = pendingBlender->getDrink();
 
+        if (pendingBlender->getDrink() == EDrinks::noDrink)
+            return ;
+        pendingBlender->StartPouring();
         if (drink != EDrinks::noDrink)
 		{
             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
@@ -113,6 +116,10 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
         pendingShaker = Cast<AShaker>(OtherActor);
         drink = pendingShaker->getDrink();
 
+        if (pendingShaker->getDrink() == EDrinks::noDrink)
+            return ;
+        bool bTiltLeft = pendingShaker->GetActorLocation().X > GetActorLocation().X;
+        pendingShaker->StartPouring(bTiltLeft);
         if (drink != EDrinks::noDrink)
 		{
             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
@@ -140,12 +147,14 @@ void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
 {
     if (OtherActor == pendingBlender)
     {
+        pendingBlender->StopPouring();
         GetWorld()->GetTimerManager().ClearTimer(glassTimer);
         pendingBlender = nullptr;
 		StopPourSound();
     }
     else if (OtherActor == pendingShaker)
     {
+        pendingShaker->StopPouring();
         GetWorld()->GetTimerManager().ClearTimer(glassTimer);
         pendingShaker  = nullptr;
 		StopPourSound();

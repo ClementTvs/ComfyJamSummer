@@ -27,6 +27,7 @@ class COMFYJAMSUMMER_API ABlenderTop : public AMoveableSprite
 	AIngredients *pendingIngredient = nullptr;
 	FTimerHandle IngredientTimer;
 	EDrinks drink = EDrinks::noDrink;
+	bool isPouring = false;
 
 	UFUNCTION()
 	void OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
@@ -44,8 +45,11 @@ class COMFYJAMSUMMER_API ABlenderTop : public AMoveableSprite
 
 	UFUNCTION()
 	void ValidateIngredient();
+	
+	public:
 
-	public :
+	void StopPouring();
+	void StartPouring();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

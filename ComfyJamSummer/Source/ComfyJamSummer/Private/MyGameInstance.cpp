@@ -4,16 +4,17 @@
 void UMyGameInstance::OnStart()
 {
     Super::OnStart();
-    if (menuMusic)
+    if (audioComponent)
     {
-        audioComponent = UGameplayStatics::SpawnSound2D(this, menuMusic);
-        if (audioComponent)
-        {
-            audioComponent->SetUISound(true);
-            audioComponent->bAutoDestroy = false;
-            audioComponent->SetVolumeMultiplier(musicVolume);
-        }
+        audioComponent->SetUISound(true);
+        audioComponent->bAutoDestroy = false;
+        audioComponent->SetVolumeMultiplier(musicVolume);
     }
+}
+
+float UMyGameInstance::GetMusicVolume() const
+{
+    return musicVolume;
 }
 
 void UMyGameInstance::SetVolume(float volume)
@@ -26,7 +27,10 @@ void UMyGameInstance::SetVolume(float volume)
 void UMyGameInstance::PlayMusic(USoundBase* music)
 {
     if (audioComponent && audioComponent->IsValidLowLevel())
-        audioComponent->FadeOut(1.0f, 0.0f);
+    {
+        audioComponent->Stop();
+        audioComponent = nullptr;
+    }
     if (music)
     {
         audioComponent = UGameplayStatics::SpawnSound2D(this, music);

@@ -25,6 +25,5 @@ class COMFYJAMSUMMER_API AMenuGameMode : public AGameModeBase
 	UPROPERTY()
 	UUserWidget* menuWidget;
 
-
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 };

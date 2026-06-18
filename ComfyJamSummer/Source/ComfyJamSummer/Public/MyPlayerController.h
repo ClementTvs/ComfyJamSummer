@@ -36,9 +36,13 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 		bool isDraggingShaker = false;
 		void OnClickPressed();
 		void OnClickReleased();
+		void TogglePause();
 	
 	public:
-
+		UPROPERTY(EditAnywhere, Category = "UI")
+		TSubclassOf<UUserWidget> pauseMenuClass;
+		UPROPERTY()
+		UUserWidget* pauseMenuInstance;
 
 		UPROPERTY(EditAnywhere, Category = "Bounds")
 		float minX;
@@ -51,5 +55,4 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 
 		bool getIsDragging() const;
 		bool getIsDraggingShaker() const;
-
 };

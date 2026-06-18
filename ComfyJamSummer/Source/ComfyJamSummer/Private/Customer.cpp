@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "PlayerHealth.h"
 #include "Glass.h"
+#include "MainGameMode.h"
 #include "TimerManager.h"
 #include "Glass.h"
 
@@ -111,6 +112,9 @@ void ACustomer::SellDrink()
 
     if (glass->getDrink() == desiredDrink)
     {
+        AMainGameMode* GM = Cast<AMainGameMode>(GetWorld()->GetAuthGameMode());
+        if (GM)
+            GM->OnDrinkSold();
         UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi !"));
         ReceiveDrink();
         glass->Destroy();

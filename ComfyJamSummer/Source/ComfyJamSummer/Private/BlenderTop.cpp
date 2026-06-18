@@ -2,6 +2,7 @@
 
 #include "BlenderTop.h"
 #include "Blender.h"
+#include "Glass.h"
 #include "MyPlayerController.h"
 
 ABlenderTop::ABlenderTop()
@@ -52,6 +53,9 @@ void ABlenderTop::clearCurrentIngredients()
 
 void ABlenderTop::ValidateIngredient()
 {
+    if (!pendingIngredient)
+        return ;
+
     EIngredientsTypes ingredientType = pendingIngredient->getIngredientType();
 
     currentIngredients.Add(ingredientType);
@@ -80,6 +84,7 @@ void ABlenderTop::OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
 {
     if (OtherActor == pendingIngredient)
     {
+        pendingIngredient->StopPouring();
         GetWorld()->GetTimerManager().ClearTimer(IngredientTimer);
         pendingIngredient = nullptr;
     }
@@ -95,12 +100,13 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
     ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
     
-    if (OtherComp->GetName() != TEXT("HitBox") || blender->IsBlenderWorking() || drink != EDrinks::noDrink || !pc->getIsDragging())
+    if (OtherComp->GetName() != TEXT("HitBox") || !blender || blender->IsBlenderWorking() || drink != EDrinks::noDrink || !pc->getIsDragging())
         return;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
         AIngredients *ingredient = Cast<AIngredients>(OtherActor);
         pendingIngredient = ingredient;
+
         EIngredientsTypes ingredientType = pendingIngredient->getIngredientType();
 
         if (currentIngredients.Contains(ingredientType))
@@ -109,6 +115,8 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
         }
         else
         {
+            bool bTiltLeft = ingredient->GetActorLocation().X > GetActorLocation().X;
+            ingredient->StartPouring(bTiltLeft);
             if (ingredientType == EIngredientsTypes::gasoline)
             {
                 UE_LOG(LogTemp, Warning, TEXT("PUTING GASOLINEEE..."));
@@ -125,10 +133,49 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
     }
 }
 
+void ABlenderTop::StartPouring()
+{
+    SetActorRotation(FRotator(0.f, 0.f, 0.f)); 
+    isPouring = true;
+}
+
+void ABlenderTop::StopPouring()
+{
+    isPouring = false;
+    SetActorRotation(FRotator(0.f, 0.f, 0.f));
+}
+
 void ABlenderTop::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
- 
+
+        if (isPouring)
+    {
+        // Vérifie si on est encore dans une hitbox
+        TArray<AActor*> overlappingActors;
+        GetOverlappingActors(overlappingActors);
+        
+        bool stillOverlapping = false;
+        for (AActor* actor : overlappingActors)
+        {
+            if (actor->IsA(AGlass::StaticClass()))
+            {
+                stillOverlapping = true;
+                break;
+            }
+        }
+        
+        if (!stillOverlapping)
+        {
+            StopPouring();
+            return;
+        }
+        
+        FRotator CurrentRotation = GetActorRotation();
+        float TargetPitch = -70.f;
+        CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetPitch, DeltaTime, 3.f);
+        SetActorRotation(CurrentRotation);
+    }
     if (GetWorld()->GetTimerManager().IsTimerActive(IngredientTimer) && timerWidgetInstance)
     {
 
@@ -141,9 +188,7 @@ void ABlenderTop::Tick(float DeltaTime)
             float Remaining = GetWorld()->GetTimerManager().GetTimerRemaining(IngredientTimer);
             float Progress = Remaining / timerDuration;
 
-            UProgressBar* Bar = Cast<UProgressBar>(
-                Widget->GetWidgetFromName(TEXT("TimerProgressBar"))
-            );
+            UProgressBar* Bar = Cast<UProgressBar>(Widget->GetWidgetFromName(TEXT("TimerProgressBar")));
 
             if (Bar)
             {

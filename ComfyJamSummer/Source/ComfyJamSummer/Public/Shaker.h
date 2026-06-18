@@ -36,6 +36,8 @@ class COMFYJAMSUMMER_API AShaker : public AMoveableSprite
 	FVector2D LastMousePos;
 	AMyPlayerController* pc;
 	bool canShake = false;
+	bool isPouring = false;
+	bool bTiltLeft = false;
 
 	UFUNCTION()
 	void OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
@@ -60,6 +62,9 @@ class COMFYJAMSUMMER_API AShaker : public AMoveableSprite
 
 	float lastMoveTime = -10.f;
 	public :
+
+	void StopPouring();
+	void StartPouring(bool bShouldTiltLeft = false);
 
 	AShaker();
 

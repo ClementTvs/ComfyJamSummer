@@ -21,9 +21,9 @@ class COMFYJAMSUMMER_API USliderBar : public UUserWidget
 		UPROPERTY(meta = (BindWidget))
 		UImage* SliderHandle;
 
-		UPROPERTY(BlueprintReadOnly)
-		float sliderValue = 0.5f;
-
+		static float sliderValue;
+		virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 	protected:
 		virtual void NativeConstruct() override;
 		virtual FReply NativeOnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
@@ -33,5 +33,10 @@ class COMFYJAMSUMMER_API USliderBar : public UUserWidget
 
 	private:
 		bool isDraggingSlider = false;
+	    bool bInitialized = false;
+	
 		void UpdateHandleFromValue();
+		virtual void NativeOnInitialized() override;
+
+
 };

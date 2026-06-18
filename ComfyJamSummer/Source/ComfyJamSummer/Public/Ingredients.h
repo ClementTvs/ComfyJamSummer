@@ -15,21 +15,35 @@ class COMFYJAMSUMMER_API AIngredients : public AMoveableSprite
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere)
-	UPaperSpriteComponent *fillSprite;
 
-	UPROPERTY(EditAnywhere)
-	EIngredientsTypes	ingredientType;
-
+	private:
+		
+		bool isPouring = false;
+		bool bTiltLeft = false;
 	public:
 
-	AIngredients();
-	virtual void BeginPlay() override;
-	const EIngredientsTypes &getIngredientType() const;
+		AIngredients();
+		virtual void BeginPlay() override;
+		const EIngredientsTypes &getIngredientType() const;
+		void StopPouring();
+		void StartPouring(bool bShouldTiltLeft = false);
 
-    UFUNCTION(BlueprintCallable, Category = "Ingredient")
-    void OnGrabbed();
+		virtual void Tick(float DeltaTime) override;
 
-    UFUNCTION(BlueprintCallable, Category = "Ingredient")
-    void OnReleased();
+
+		UPROPERTY(EditAnywhere)
+		UPaperSpriteComponent *fillSprite;
+
+		UPROPERTY(EditAnywhere)
+		EIngredientsTypes ingredientType;
+
+		AIngredients();
+		
+		const EIngredientsTypes &getIngredientType() const;
+
+		UFUNCTION(BlueprintCallable, Category = "Ingredient")
+		void OnGrabbed();
+
+		UFUNCTION(BlueprintCallable, Category = "Ingredient")
+		void OnReleased();
 };
