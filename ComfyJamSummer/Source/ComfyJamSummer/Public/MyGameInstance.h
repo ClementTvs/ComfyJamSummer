@@ -19,6 +19,16 @@ class COMFYJAMSUMMER_API UMyGameInstance : public UGameInstance
         UPROPERTY(EditAnywhere, Category = "Audio")
         USoundBase* menuMusic;
 
+        UPROPERTY(EditAnywhere, Category = "Audio")
+        USoundBase* gameMusic;
+
+        UPROPERTY(EditAnywhere, Category = "Audio")
+        USoundBase* goodEndingMusic;
+
+        UPROPERTY(EditAnywhere, Category = "Audio")
+        USoundBase* badEndingMusic;
+
+
         UPROPERTY()
         UAudioComponent* audioComponent = nullptr;
 
