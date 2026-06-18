@@ -58,7 +58,7 @@ void AMyPlayerController::OnClickPressed()
         return;
     if (!Hit.GetActor()->IsA(ABlenderTop::StaticClass()))
         isDragging = true;
-    if (!Hit.GetActor()->IsA(AShaker::StaticClass()))
+    if (Hit.GetActor()->IsA(AShaker::StaticClass()))
         isDraggingShaker = true;
     if (Hit.GetActor())
     {

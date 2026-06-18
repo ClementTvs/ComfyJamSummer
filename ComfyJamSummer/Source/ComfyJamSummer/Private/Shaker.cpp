@@ -59,7 +59,7 @@ void AShaker::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
 {
     ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
 
-    if (OtherComp->GetName() != TEXT("HitBox") || drink != EDrinks::noDrink || !pc->getIsDragging() || !pc->getIsDraggingShaker())
+    if (OtherComp->GetName() != TEXT("HitBox") || drink != EDrinks::noDrink || !pc->getIsDragging() || pc->getIsDraggingShaker())
         return ;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
@@ -200,6 +200,10 @@ void AShaker::Tick(float DeltaTime)
 
     if (!currentIngredients.IsEmpty())
     {
+        if (!pc || !pc->getIsDraggingShaker())
+            return;
+
+        UE_LOG(LogTemp, Warning, TEXT("RENTRE"));
         FVector2D CurrentMousePos;
         pc->GetMousePosition(CurrentMousePos.X, CurrentMousePos.Y);
 
