@@ -60,7 +60,6 @@ class COMFYJAMSUMMER_API AShaker : public AMoveableSprite
 	void StartShakerSound();
 	void StopShakerSound();
 
-	float lastMoveTime = -10.f;
 	public :
 
 	void StopPouring();

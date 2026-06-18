@@ -167,13 +167,13 @@ void ABlenderTop::Tick(float DeltaTime)
         if (!stillOverlapping)
         {
             StopPouring();
-            return;
-        }
+        } else {
+			FRotator CurrentRotation = GetActorRotation();
+			float TargetPitch = -70.f;
+			CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetPitch, DeltaTime, 3.f);
+			SetActorRotation(CurrentRotation);
+		}
         
-        FRotator CurrentRotation = GetActorRotation();
-        float TargetPitch = 70.f;
-        CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetPitch, DeltaTime, 3.f);
-        SetActorRotation(CurrentRotation);
     }
     if (GetWorld()->GetTimerManager().IsTimerActive(IngredientTimer) && timerWidgetInstance)
     {

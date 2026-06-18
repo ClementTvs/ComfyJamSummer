@@ -12,12 +12,13 @@ void AIngredients::BeginPlay()
 {
     Super::BeginPlay();
 
-    hitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // comme le blendertop, pas QueryAndPhysics
+    hitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     hitBox->SetCollisionObjectType(ECC_WorldDynamic);
     hitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
     hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
     hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+	hitBox->SetUsingAbsoluteRotation(true); 
     hitBox->SetGenerateOverlapEvents(true);
 
     UE_LOG(LogTemp, Warning, TEXT("INGREDIENT %s: WorldStatic resp=%d, enabled=%d, genOverlap=%d"),
