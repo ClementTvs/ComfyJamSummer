@@ -41,6 +41,7 @@ void AShaker::BeginPlay()
 
 void AShaker::ValidateIngredient()
 {
+    pendingIngredient->StopPouring();
     if (!pendingIngredient)
         return ;
     EIngredientsTypes ingredientType = pendingIngredient->getIngredientType();
@@ -164,7 +165,6 @@ void AShaker::resetDrink()
 
 void AShaker::StartPouring(bool bShouldTiltLeft)
 {
-    SetActorRotation(FRotator(0.f, 0.f, 0.f)); 
     isPouring = true;
     this->bTiltLeft = bShouldTiltLeft;
 }
@@ -207,12 +207,8 @@ void AShaker::Tick(float DeltaTime)
         SetActorRotation(CurrentRotation);
     }
 
-    if (!currentIngredients.IsEmpty())
+    if (!currentIngredients.IsEmpty() && pc && pc->getIsDraggingShaker())
     {
-        if (!pc || !pc->getIsDraggingShaker())
-            return;
-
-        UE_LOG(LogTemp, Warning, TEXT("RENTRE"));
         FVector2D CurrentMousePos;
         pc->GetMousePosition(CurrentMousePos.X, CurrentMousePos.Y);
 

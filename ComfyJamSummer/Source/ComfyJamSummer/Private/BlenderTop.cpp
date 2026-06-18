@@ -53,6 +53,7 @@ void ABlenderTop::clearCurrentIngredients()
 
 void ABlenderTop::ValidateIngredient()
 {
+    pendingIngredient->StopPouring();
     if (!pendingIngredient)
         return ;
 
@@ -135,7 +136,6 @@ void ABlenderTop::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
 
 void ABlenderTop::StartPouring()
 {
-    SetActorRotation(FRotator(0.f, 0.f, 0.f)); 
     isPouring = true;
 }
 

@@ -105,6 +105,8 @@ void AGlass::FillGlass()
     }
     else if (pendingBlender)
         pendingBlender->resetDrink();
+    pendingBlender->StopPouring();
+
 }
 
 void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
@@ -115,8 +117,6 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
 	const FHitResult& SweepResult)
 {
     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
-
-
 
     if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
     {
@@ -178,6 +178,7 @@ void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
     }
     else if (OtherActor == pendingShaker)
     {
+        UE_LOG(LogTemp, Warning, TEXT("RENTRE"))
         pendingShaker->StopPouring();
         GetWorld()->GetTimerManager().ClearTimer(glassTimer);
         pendingShaker  = nullptr;
