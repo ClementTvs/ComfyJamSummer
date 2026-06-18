@@ -92,10 +92,15 @@ void AGlass::FillGlass()
 	
     if (pendingShaker)
     {
-        pendingShaker->resetDrink();
-		pendingShaker->StopPouring();
-        pendingShaker->shakerOpenSprite->SetVisibility(false);
-        pendingShaker->GetSprite()->SetVisibility(true); 
+        AShaker* shaker = pendingShaker;
+        pendingShaker = nullptr;
+
+        shaker->resetDrink();
+        if (shaker->shakerOpenSprite)
+            shaker->shakerOpenSprite->SetVisibility(false);
+        if (shaker->GetSprite())
+            shaker->GetSprite()->SetVisibility(true);
+        shaker->StopPouring();
     }
     else if (pendingBlender)
 	{

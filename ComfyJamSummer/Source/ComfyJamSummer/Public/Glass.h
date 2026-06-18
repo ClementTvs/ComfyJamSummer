@@ -27,12 +27,16 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	private:
 
 	EDrinks drink = EDrinks::noDrink;
-	ABlenderTop *pendingBlender = nullptr;
-	AShaker *pendingShaker = nullptr;
-	AIngredients *pendingIngredient = nullptr;
 	FTimerHandle glassTimer;
 	float timerDuration;
 	bool isFill = false;
+
+	UPROPERTY()
+	ABlenderTop *pendingBlender = nullptr;
+	UPROPERTY()
+	AShaker *pendingShaker = nullptr;
+	UPROPERTY()
+	AIngredients *pendingIngredient = nullptr;
 
 	UFUNCTION()
 	void FillGlass();
