@@ -25,8 +25,19 @@ private:
     EDeathCause lockedEnding = EDeathCause::None;
 
     void UpdateHearts();
+    
+    void firedEnd();
+    void policeEnd();
+
 
 public:
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> policeEndingScreen;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> firedEndingScreen;
+    
     APlayerHealth();
     void LoseLife(EDeathCause cause);
 

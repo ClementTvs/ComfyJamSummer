@@ -42,7 +42,7 @@ class COMFYJAMSUMMER_API ATrash : public AMoveableSprite
 		void Throw();
 
 		UPROPERTY(EditAnywhere, Category = "Glass")
-		FVector spawnLocation = FVector::ZeroVector;
+		FVector spawnLocation;
 
 		UPROPERTY(EditAnywhere, Category = "Glass")
 		TSubclassOf<AGlass> glassClass;

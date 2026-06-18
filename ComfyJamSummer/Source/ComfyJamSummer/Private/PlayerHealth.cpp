@@ -1,3 +1,7 @@
+
+#include "MyGameInstance.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 #include "PlayerHealth.h"
 
 APlayerHealth::APlayerHealth()
@@ -49,14 +53,46 @@ void APlayerHealth::LoseLife(EDeathCause cause)
 
         if (lockedEnding == EDeathCause::Arrest)
         {
-            UE_LOG(LogTemp, Warning, TEXT("GAME OVER : ARRETE PAR LA POLICE"));
-            // TODO: ecran / niveau "arrete"
+            policeEnd();
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("GAME OVER : VIRE"));
-            // TODO: ecran / niveau "vire"
+            firedEnd();
         }
+    }
+}
+
+void APlayerHealth::policeEnd()
+{
+    if (policeEndingScreen)
+    {
+        arrestCount = 0;
+        firedCount = 0;
+        lockedEnding = EDeathCause::None;
+        UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), policeEndingScreen);
+        EndScreen->AddToViewport();
+        UGameplayStatics::SetGamePaused(this, true);
+        
+        UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
+        if (GI)
+            GI->PlayMusic(GI->badEndingMusic);
+    }
+}
+
+void APlayerHealth::firedEnd()
+{
+    if (firedEndingScreen)
+    {
+        arrestCount = 0;
+        firedCount = 0;
+        lockedEnding = EDeathCause::None;
+        UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), firedEndingScreen);
+        EndScreen->AddToViewport();
+        UGameplayStatics::SetGamePaused(this, true);
+        
+        UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
+        if (GI)
+            GI->PlayMusic(GI->badEndingMusic);
     }
 }
 

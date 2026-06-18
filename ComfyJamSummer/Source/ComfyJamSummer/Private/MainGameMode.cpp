@@ -36,6 +36,8 @@ void AMainGameMode::GoodEnd()
 {
     if (goodEndingScreen)
     {
+        drinksGasolineSold = 0;
+        drinksSold = 0;
         UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), goodEndingScreen);
         EndScreen->AddToViewport();
         UGameplayStatics::SetGamePaused(this, true);
@@ -50,6 +52,8 @@ void AMainGameMode::AlienEnd()
 {
     if (alienEndingScreen)
     {
+        drinksGasolineSold = 0;
+        drinksSold = 0;
         UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), alienEndingScreen);
         EndScreen->AddToViewport();
         UGameplayStatics::SetGamePaused(this, true);
