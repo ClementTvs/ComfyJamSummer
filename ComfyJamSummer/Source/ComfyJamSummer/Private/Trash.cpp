@@ -5,8 +5,6 @@
 
 ATrash::ATrash()
 {
-    // hitBox = CreateDefaultSubobject<UBoxComponent>("HitBox");
-    
     hitBox->OnComponentBeginOverlap.AddDynamic(this, &ATrash::OnGlassOverlap);
     UE_LOG(LogTemp, Warning, TEXT("SIU"));
 

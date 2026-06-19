@@ -3,7 +3,6 @@
 
 #include "MoveableSprite.h"
 
-// Sets default values
 AMoveableSprite::AMoveableSprite()
 {
     root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -13,15 +12,13 @@ AMoveableSprite::AMoveableSprite()
     hitBox->SetupAttachment(root);
     sprite->SetupAttachment(root);
 
-    // Le sprite ne doit pas intercepter le clic à la place du hitBox
     sprite->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    // hitBox = à la fois cliquable (Visibility) et overlap avec le fillHitBox du blender
     hitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     hitBox->SetCollisionObjectType(ECC_WorldDynamic);
     hitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-    hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);    // pour GetHitResultUnderCursor
-    hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap); // pour overlaper le blender
+    hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+    hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     hitBox->SetGenerateOverlapEvents(true);
 }
 

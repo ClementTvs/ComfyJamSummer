@@ -13,6 +13,8 @@
 #include "Components/AudioComponent.h"
 #include "Glass.generated.h"
 
+class Pouring;
+
 class AShaker;
 class ABlenderTop;
 
@@ -37,6 +39,11 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	AShaker *pendingShaker = nullptr;
 	UPROPERTY()
 	AIngredients *pendingIngredient = nullptr;
+
+	UPROPERTY()
+    UPouring* pendingSpout = nullptr;
+
+    void CancelPour();
 
 	UFUNCTION()
 	void FillGlass();

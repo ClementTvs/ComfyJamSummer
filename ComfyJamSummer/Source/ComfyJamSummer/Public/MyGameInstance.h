@@ -1,5 +1,3 @@
-// MyGameInstance.h
-
 #pragma once
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"

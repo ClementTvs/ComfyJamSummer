@@ -1,8 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Glass.h"
 #include "Shaker.h"
+#include "Pouring.h"
 
 AShaker::AShaker()
 {
@@ -11,12 +9,13 @@ AShaker::AShaker()
     fillHitBox = CreateDefaultSubobject<UBoxComponent>("FillHitBox");
     timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
     shakerOpenSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("ShakerOpenSprite"));
+    pourSpout = CreateDefaultSubobject<UPouring>(TEXT("PourSpout"));
 
     timerWidgetInstance->SetupAttachment(root);
     fillHitBox->SetupAttachment(root);
     shakerOpenSprite->SetupAttachment(root);
-    
-	timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
+
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
     timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 40.f));
     timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
     timerWidgetInstance->SetWorldScale3D(FVector(0.07f, 0.07f, 0.07f));
@@ -38,38 +37,22 @@ void AShaker::BeginPlay()
     pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
     shakerOpenSprite->SetVisibility(false);
 
-	fillHitBox->SetUsingAbsoluteRotation(true);
+    fillHitBox->SetUsingAbsoluteRotation(true);
     hitBox->SetUsingAbsoluteRotation(true);
 }
 
-void AShaker::ValidateIngredient()
-{
-    pendingIngredient->StopPouring();
-    if (!pendingIngredient)
-        return ;
-    EIngredientsTypes ingredientType = pendingIngredient->getIngredientType();
-    currentIngredients.Add(ingredientType);
-	pendingIngredient->StopPouring();
-    UE_LOG(LogTemp, Warning, TEXT("INGREDIENT ADDED"));
-}
-
-
 void AShaker::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
+    AActor* OtherActor, UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
+    if (OtherComp->GetName() != TEXT("HitBox") || drink != EDrinks::noDrink
+        || !pc->getIsDragging() || pc->getIsDraggingShaker())
+        return;
 
-    if (OtherComp->GetName() != TEXT("HitBox") || drink != EDrinks::noDrink || !pc->getIsDragging() || pc->getIsDraggingShaker())
-        return ;
     if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()))
     {
         AIngredients *ingredient = Cast<AIngredients>(OtherActor);
-        pendingIngredient = ingredient;
-        EIngredientsTypes ingredientType = pendingIngredient->getIngredientType();
+        EIngredientsTypes ingredientType = ingredient->getIngredientType();
 
         canShake = true;
         if (currentIngredients.Contains(ingredientType))
@@ -78,35 +61,40 @@ void AShaker::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
         }
         else
         {
-            bool isTiltLeft = ingredient->GetActorLocation().X > GetActorLocation().X;
-            ingredient->StartPouring(isTiltLeft);
-            if (ingredientType == EIngredientsTypes::gasoline)
-            {
-                UE_LOG(LogTemp, Warning, TEXT("PUTING GASOLINEEE..."));
-                timerDuration = 3.0f;
-                GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this, &AShaker::ValidateIngredient, timerDuration, false);
-            }
-            else
-            {
-                timerDuration = 1.0f;
-                GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this, &AShaker::ValidateIngredient, timerDuration, false);
-            }
+            pendingIngredient = ingredient;
+            pendingIngredientSpout = ingredient->FindComponentByClass<UPouring>();
 
+            timerDuration = (ingredientType == EIngredientsTypes::gasoline) ? 3.0f : 1.0f;
+            GetWorld()->GetTimerManager().SetTimer(IngredientTimer, this,
+                &AShaker::ValidateIngredient, timerDuration, false);
         }
     }
 }
 
 void AShaker::OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex)
+    AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     if (OtherActor == pendingIngredient)
-    {
-        pendingIngredient->StopPouring();
-        GetWorld()->GetTimerManager().ClearTimer(IngredientTimer);
-        pendingIngredient = nullptr;
-    }
+        CancelIngredientPour();
+}
+
+void AShaker::CancelIngredientPour()
+{
+    GetWorld()->GetTimerManager().ClearTimer(IngredientTimer);
+    pendingIngredient = nullptr;
+    pendingIngredientSpout = nullptr;
+}
+
+void AShaker::ValidateIngredient()
+{
+    if (!pendingIngredient)
+        return;
+
+    currentIngredients.Add(pendingIngredient->getIngredientType());
+    UE_LOG(LogTemp, Warning, TEXT("INGREDIENT ADDED"));
+
+    pendingIngredient = nullptr;
+    pendingIngredientSpout = nullptr;
 }
 
 bool AShaker::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
@@ -114,97 +102,51 @@ bool AShaker::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
     if (recipe.Num() != currentIngredients.Num())
         return false;
     for (EIngredientsTypes ingredients : recipe)
-    {
         if (!currentIngredients.Contains(ingredients))
             return false;
-    }
     return true;
 }
 
 void AShaker::makeDrink()
 {
-    TArray<EIngredientsTypes> pinaColadaRecipe =
-    {
-        EIngredientsTypes::yellow,
-        EIngredientsTypes::blue
-    };
-
-    TArray<EIngredientsTypes> pinaColadaGasolineRecipe =
-    {
-        EIngredientsTypes::yellow,
-        EIngredientsTypes::blue,
-        EIngredientsTypes::gasoline
-    };
-
-    TArray<EIngredientsTypes> straightGasoline =
-    {
-        EIngredientsTypes::gasoline
-    };
+    TArray<EIngredientsTypes> pinaColadaRecipe = { EIngredientsTypes::yellow, EIngredientsTypes::blue };
+    TArray<EIngredientsTypes> pinaColadaGasolineRecipe = { EIngredientsTypes::yellow, EIngredientsTypes::blue, EIngredientsTypes::gasoline };
+    TArray<EIngredientsTypes> straightGasoline = { EIngredientsTypes::gasoline };
 
     if (ContainsRecipe(pinaColadaRecipe))
-    {
-        drink = EDrinks::pinaColada;
-    }
-	else if (ContainsRecipe(straightGasoline))
+		drink = EDrinks::pinaColada;
+    else if (ContainsRecipe(straightGasoline))
 		drink = EDrinks::gasoline;
     else if (ContainsRecipe(pinaColadaGasolineRecipe))
 		drink = EDrinks::pinaColadaG;
     else
-        drink = EDrinks::badDrink;
+		drink = EDrinks::badDrink;
+
     currentIngredients.Empty();
     shakerOpenSprite->SetVisibility(true);
     sprite->SetVisibility(false);
 }
 
-EDrinks AShaker::getDrink() const
-{
-    return drink;
-}
-
-void AShaker::resetDrink()
-{
-    drink = EDrinks::noDrink;
-}
-
-void AShaker::StartPouring(bool bShouldTiltLeft)
-{
-    isPouring = true;
-    this->bTiltLeft = bShouldTiltLeft;
-}
-
-void AShaker::StopPouring()
-{
-    isPouring = false;
-    SetActorRotation(FRotator(0.f, 0.f, 0.f));
-}
+EDrinks AShaker::getDrink() const { return drink; }
+void AShaker::resetDrink() { drink = EDrinks::noDrink; }
 
 void AShaker::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (isPouring)
+    if (pendingIngredient && pendingIngredientSpout)
     {
-        TArray<AActor*> overlappingActors;
-        GetOverlappingActors(overlappingActors);
-
-        bool stillOverlapping = false;
-        for (AActor* actor : overlappingActors)
+        TArray<AActor*> over;
+        GetOverlappingActors(over);
+        if (over.Contains(pendingIngredient))
         {
-            if (actor->IsA(AGlass::StaticClass()))
-            {
-                stillOverlapping = true;
-                break;
-            }
+            const float side = (pendingIngredient->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
+            pendingIngredientSpout->KeepPouring(side);
         }
-        if (!stillOverlapping)
+        else
         {
-            StopPouring();
-        } else {
-			FRotator CurrentRotation = GetActorRotation();
-			float TargetPitch = bTiltLeft ? 70.f : -70.f;
-			CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetPitch, DeltaTime, 3.f);
-			SetActorRotation(CurrentRotation);
-		}
+            CancelIngredientPour();
+        }
     }
 
     if (!currentIngredients.IsEmpty() && pc && pc->getIsDraggingShaker())
@@ -212,8 +154,7 @@ void AShaker::Tick(float DeltaTime)
         FVector2D CurrentMousePos;
         pc->GetMousePosition(CurrentMousePos.X, CurrentMousePos.Y);
 
-        float Delta = FVector2D::Distance(CurrentMousePos, LastMousePos);
-        Delta = Delta / 20.f;
+        float Delta = FVector2D::Distance(CurrentMousePos, LastMousePos) / 20.f;
         ShakePower += Delta;
         LastMousePos = CurrentMousePos;
 
@@ -239,11 +180,8 @@ void AShaker::Tick(float DeltaTime)
         if (Widget)
         {
             Widget->SetVisibility(ESlateVisibility::Visible);
-            float Remaining = GetWorld()->GetTimerManager().GetTimerRemaining(IngredientTimer);
-            float Progress = Remaining / timerDuration;
-            UProgressBar* Bar = Cast<UProgressBar>(
-                Widget->GetWidgetFromName(TEXT("TimerProgressBar")));
-            if (Bar)
+            float Progress = GetWorld()->GetTimerManager().GetTimerRemaining(IngredientTimer) / timerDuration;
+            if (UProgressBar* Bar = Cast<UProgressBar>(Widget->GetWidgetFromName(TEXT("TimerProgressBar"))))
                 Bar->SetPercent(Progress);
         }
     }

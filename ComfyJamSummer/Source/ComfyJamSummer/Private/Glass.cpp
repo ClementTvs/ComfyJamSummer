@@ -1,8 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Drinks.h"
 #include "MyPlayerController.h"
 #include "Glass.h"
+#include "Pouring.h"
 
 AGlass::AGlass()
 {
@@ -10,13 +9,13 @@ AGlass::AGlass()
 
     fillHitBox = CreateDefaultSubobject<UBoxComponent>("FillHitBox");
     pinaColadaSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PinaColadaSprite"));
-	daiquiriSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSprite"));
-	margaritaSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("margaritaSprite"));
+    daiquiriSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSprite"));
+    margaritaSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("margaritaSprite"));
     badDrinkSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("BadDrinkSprite"));
     daiquiriSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("DaiquiriSpriteGasoline"));
-	margaritaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("MargaritaSpriteGasoline"));
+    margaritaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("MargaritaSpriteGasoline"));
     pinaColadaSpriteGasoline = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("PinaColadaSpriteGasoline"));
-	straightGasolineSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("StraightGasolineSprite"));
+    straightGasolineSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("StraightGasolineSprite"));
     timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
 
     fillHitBox->SetupAttachment(root);
@@ -27,13 +26,13 @@ AGlass::AGlass()
     margaritaSpriteGasoline->SetupAttachment(root);
     pinaColadaSpriteGasoline->SetupAttachment(root);
     daiquiriSprite->SetupAttachment(root);
-	straightGasolineSprite->SetupAttachment(root);
+    straightGasolineSprite->SetupAttachment(root);
     timerWidgetInstance->SetupAttachment(root);
-	timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
-	timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
-	timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
-	timerWidgetInstance->SetRelativeScale3D(FVector(0.07f, 0.07f, 0.07f));
-	timerWidgetInstance->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+    timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
+    timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
+    timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));
+    timerWidgetInstance->SetRelativeScale3D(FVector(0.07f, 0.07f, 0.07f));
+    timerWidgetInstance->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
     fillHitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     fillHitBox->SetCollisionObjectType(ECC_WorldStatic);
@@ -50,25 +49,24 @@ AGlass::AGlass()
 void AGlass::BeginPlay()
 {
     Super::BeginPlay();
-
     timerWidgetInstance->SetWidgetClass(timerWidgetClass);
 }
 
 void AGlass::FillGlass()
 {
-	StopPourSound();
+    StopPourSound();
     isFill = true;
     sprite->SetVisibility(false);
 
     switch (drink)
     {
-		case EDrinks::pinaColada:
+        case EDrinks::pinaColada:
 			pinaColadaSprite->SetVisibility(true);
 			break;
-		case EDrinks::daiquiri:
+        case EDrinks::daiquiri:
 			daiquiriSprite->SetVisibility(true);
 			break;
-		case EDrinks::margarita:
+        case EDrinks::margarita:
 			margaritaSprite->SetVisibility(true);
 			break;
         case EDrinks::pinaColadaG:
@@ -77,19 +75,19 @@ void AGlass::FillGlass()
         case EDrinks::daiquiriG:
 			daiquiriSpriteGasoline->SetVisibility(true);
 			break;
-		case EDrinks::margaritaG:
+        case EDrinks::margaritaG:
 			margaritaSpriteGasoline->SetVisibility(true);
 			break;
-		case EDrinks::badDrink:
+        case EDrinks::badDrink:
 			badDrinkSprite->SetVisibility(true);
 			break;
-		case EDrinks::gasoline:
+        case EDrinks::gasoline:
 			straightGasolineSprite->SetVisibility(true);
 			break;
-		default: 
+        default: 
 			break;
     }
-	
+
     if (pendingShaker)
     {
         AShaker* shaker = pendingShaker;
@@ -100,138 +98,126 @@ void AGlass::FillGlass()
             shaker->shakerOpenSprite->SetVisibility(false);
         if (shaker->GetSprite())
             shaker->GetSprite()->SetVisibility(true);
-        shaker->StopPouring();
     }
     else if (pendingBlender)
-	{
-        pendingBlender->resetDrink();
-        pendingBlender->StopPouring();
+    {
+        ABlenderTop* blender = pendingBlender;
+        pendingBlender = nullptr;
+        blender->resetDrink();
     }
+
+    pendingIngredient = nullptr;
+    pendingSpout = nullptr;
 }
 
-void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex,
-	bool bFromSweep,
-	const FHitResult& SweepResult)
+void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(glassTimer))
+        return;
     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 
     if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
     {
         pendingBlender = Cast<ABlenderTop>(OtherActor);
         drink = pendingBlender->getDrink();
-
-
-        if (pendingBlender->getDrink() == EDrinks::noDrink)
-            return ;
-        pendingBlender->StartPouring();
-        if (drink != EDrinks::noDrink)
-		{
-            GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-			StartPourSound();
+        if (drink == EDrinks::noDrink) 
+		{ 
+			pendingBlender = nullptr; 
+			return; 
 		}
+
+        pendingSpout = OtherActor->FindComponentByClass<UPouring>();
+        GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+        StartPourSound();
     }
     else if (OtherActor && OtherActor->IsA(AShaker::StaticClass()) && isFill == false && pc->getIsDraggingShaker())
     {
         pendingShaker = Cast<AShaker>(OtherActor);
         drink = pendingShaker->getDrink();
-
-        if (pendingShaker->getDrink() == EDrinks::noDrink)
-            return ;
-        bool bTiltLeft = pendingShaker->GetActorLocation().X > GetActorLocation().X;
-        pendingShaker->StartPouring(bTiltLeft);
-        if (drink != EDrinks::noDrink)
-		{
-            GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-			StartPourSound();
+        if (drink == EDrinks::noDrink) 
+		{ 
+			pendingShaker = nullptr; 
+			return; 
 		}
+
+        pendingSpout = OtherActor->FindComponentByClass<UPouring>();
+        GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+        StartPourSound();
     }
     else if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()) && isFill == false)
     {
         AIngredients* ingredient = Cast<AIngredients>(OtherActor);
-
         if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
         {
             pendingIngredient = ingredient;
-
             drink = EDrinks::gasoline;
-            pendingIngredient->StartPouring(false);
+            pendingSpout = OtherActor->FindComponentByClass<UPouring>();
             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-			StartPourSound();
+            StartPourSound();
         }
     }
 }
 
-void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
-	AActor* OtherActor,
-	UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex)
+void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    if (OtherActor == pendingBlender)
-    {
-        pendingBlender->StopPouring();
-        GetWorld()->GetTimerManager().ClearTimer(glassTimer);
-        pendingBlender = nullptr;
-		StopPourSound();
-    }
-    else if (OtherActor == pendingShaker)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("RENTRE"))
-        pendingShaker->StopPouring();
-        GetWorld()->GetTimerManager().ClearTimer(glassTimer);
-        pendingShaker  = nullptr;
-		StopPourSound();
-    }
-	else if (OtherActor == pendingIngredient)
-	{
-        pendingIngredient->StopPouring();
-		GetWorld()->GetTimerManager().ClearTimer(glassTimer);
-		pendingIngredient = nullptr;
-		StopPourSound();
-	}
+    if (pendingSpout && OtherActor == pendingSpout->GetOwner())
+        CancelPour();
 }
 
-EDrinks AGlass::getDrink() const
+void AGlass::CancelPour()
 {
-    return drink;
+    GetWorld()->GetTimerManager().ClearTimer(glassTimer);
+    StopPourSound();
+    pendingBlender = nullptr;
+    pendingShaker = nullptr;
+    pendingIngredient = nullptr;
+    pendingSpout = nullptr;
+}
+
+EDrinks AGlass::getDrink() const 
+{ 
+	return drink;
 }
 
 void AGlass::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if (pendingSpout)
+    {
+        AActor* spoutOwner = pendingSpout->GetOwner();
+        TArray<AActor*> over;
+        fillHitBox->GetOverlappingActors(over);
+
+        if (IsValid(spoutOwner) && over.Contains(spoutOwner))
+        {
+            const float side = (spoutOwner->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
+            pendingSpout->KeepPouring(side);
+        }
+        else
+        {
+            CancelPour();
+        }
+    }
+
     if (GetWorld()->GetTimerManager().IsTimerActive(glassTimer) && timerWidgetInstance)
     {
-
         UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
-
         if (Widget)
         {
             Widget->SetVisibility(ESlateVisibility::Visible);
-
-            float Remaining = GetWorld()->GetTimerManager().GetTimerRemaining(glassTimer);
-            float Progress = Remaining / timerDuration;
-
-            UProgressBar* Bar = Cast<UProgressBar>(
-                Widget->GetWidgetFromName(TEXT("TimerProgressBar"))
-            );
-
-            if (Bar)
-            {
+            float Progress = GetWorld()->GetTimerManager().GetTimerRemaining(glassTimer) / timerDuration;
+            if (UProgressBar* Bar = Cast<UProgressBar>(Widget->GetWidgetFromName(TEXT("TimerProgressBar"))))
                 Bar->SetPercent(Progress);
-            }
         }
     }
     else if (timerWidgetInstance)
     {
         UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
-
         if (Widget)
-        {
             Widget->SetVisibility(ESlateVisibility::Hidden);
-        }
     }
 }
 
