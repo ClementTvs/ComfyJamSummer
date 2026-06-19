@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "MyGameInstance.h"
 #include "Alien.generated.h"
 
 UENUM(BlueprintType)
@@ -43,13 +44,18 @@ protected:
 	float LookAwayTimeMin = 6.f;
 	UPROPERTY(EditAnywhere, Category = "Alien|Timing")
 	float LookAwayTimeMax = 9.f;
-	
+	UPROPERTY(EditAnywhere, Category = "Alien|Audio")
+	USoundBase* turnWarningSound;
+	UPROPERTY(EditAnywhere, Category = "Alien|Timing")
+	float warningLeadTime = 1.f;
 
+	FTimerHandle WarningTimer;
 	FTimerHandle StateTimer;
 
 	void StartWatching();
 	void StartLookingAway();
 	void OnPlayerCaught();
+	void PlayTurnWarning();
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Alien")

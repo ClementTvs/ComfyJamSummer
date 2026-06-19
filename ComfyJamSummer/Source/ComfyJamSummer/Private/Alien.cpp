@@ -39,6 +39,10 @@ void AAlien::StartLookingAway()
 {
 	State = EAlienState::LookAway;
 	float Duration = FMath::RandRange(LookAwayTimeMin, LookAwayTimeMax);
+
+	const float lead = FMath::Min(warningLeadTime, Duration);
+    GetWorldTimerManager().SetTimer(WarningTimer, this, &AAlien::PlayTurnWarning, Duration - lead, false);
+
 	GetWorldTimerManager().SetTimer(StateTimer, this, &AAlien::StartWatching, Duration, false);
 }
 
@@ -72,4 +76,10 @@ void AAlien::SetAlienState(EAlienState NewState)
 bool AAlien::isWatching() const
 {
 	return State == EAlienState::Idle;
+}
+
+void AAlien::PlayTurnWarning()
+{
+    if (UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance()))
+        GI->SpawnSFX(turnWarningSound, 10.f);
 }
