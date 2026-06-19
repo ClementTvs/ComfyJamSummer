@@ -4,8 +4,11 @@ ABackgroundActor::ABackgroundActor()
 {
     PrimaryActorTick.bCanEverTick = false;
 
+    USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+    RootComponent = root;
+    
     baseBackground = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("baseBackground"));
-    RootComponent = baseBackground;
+    baseBackground->SetupAttachment(RootComponent);
 
     alien1 = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("alien1"));
     alien1->SetupAttachment(RootComponent);
