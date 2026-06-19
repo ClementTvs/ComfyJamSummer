@@ -13,16 +13,16 @@ class COMFYJAMSUMMER_API ABackgroundActor : public AActor
 	public:
 		ABackgroundActor();
 
-		UPROPERTY(VisibleAnywhere)
+		UPROPERTY(EditAnywhere)
 		UPaperSpriteComponent* baseBackground;
 
-		UPROPERTY(VisibleAnywhere)
+		UPROPERTY(EditAnywhere)
 		UPaperSpriteComponent* alien1;
 
-		UPROPERTY(VisibleAnywhere)
+		UPROPERTY(EditAnywhere)
 		UPaperSpriteComponent* alien2;
 
-		UPROPERTY(VisibleAnywhere)
+		UPROPERTY(EditAnywhere)
 		UPaperSpriteComponent* alien3;
 
 		void UpdateBackground(int32 DrinksSold);
