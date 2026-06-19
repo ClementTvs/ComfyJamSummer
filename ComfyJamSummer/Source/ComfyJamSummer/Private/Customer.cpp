@@ -248,5 +248,14 @@ void ACustomer::StartLeaveTimer()
 
 void ACustomer::Leave()
 {
+    if (alienSprite)
+        spriteComp->SetSprite(alienSprite);
+
+    const float destroyDelay = 0.3f;
+    GetWorldTimerManager().SetTimer(leaveTimer, this, &ACustomer::FinalizeLeave, destroyDelay, false);
+}
+
+void ACustomer::FinalizeLeave()
+{
     Destroy();
 }

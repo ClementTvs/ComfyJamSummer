@@ -120,10 +120,10 @@ void ABlender::BlenderStart()
 {
     static const TMap<EDrinks, TArray<EIngredientsTypes>> Recipes =
     {
-        { EDrinks::daiquiri,   { EIngredientsTypes::red, EIngredientsTypes::yellow } },
-        { EDrinks::margarita,  { EIngredientsTypes::red, EIngredientsTypes::blue } },
-        { EDrinks::daiquiriG,   { EIngredientsTypes::red, EIngredientsTypes::yellow, EIngredientsTypes::gasoline } },
-        { EDrinks::margaritaG,  { EIngredientsTypes::red, EIngredientsTypes::blue, EIngredientsTypes::gasoline } },
+        { EDrinks::daiquiri,   { EIngredientsTypes::red, EIngredientsTypes::blue } },
+        { EDrinks::margarita,  { EIngredientsTypes::red, EIngredientsTypes::yellow } },
+        { EDrinks::daiquiriG,   { EIngredientsTypes::red, EIngredientsTypes::blue, EIngredientsTypes::gasoline } },
+        { EDrinks::margaritaG,  { EIngredientsTypes::red, EIngredientsTypes::yellow, EIngredientsTypes::gasoline } },
 		{ EDrinks::gasoline, { EIngredientsTypes::gasoline }}
     };
 

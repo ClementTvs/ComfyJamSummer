@@ -87,6 +87,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Glass")
 	FVector spawnLocation = FVector::ZeroVector;
 
+	UPROPERTY(EditAnywhere, Category = "Sprites|Alien")
+    class UPaperSprite* alienSprite;
+
     void ReceiveDrink();
     ECustomerState GetState() const { return currentState; }
 
@@ -102,4 +105,5 @@ private:
     void DecreasePatience();
     void UpdateState();
     void ApplyStateSprite();
+	void FinalizeLeave();
 };
