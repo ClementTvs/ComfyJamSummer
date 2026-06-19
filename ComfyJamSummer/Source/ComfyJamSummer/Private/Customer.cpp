@@ -117,18 +117,16 @@ void ACustomer::SellDrink()
     {
         GM->OnDrinkGasolineSold();
         UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi !"));
-        ReceiveDrink();
+        ReceiveDrink(false);
         glass->Destroy();
 		GetWorld()->SpawnActor<AGlass>(glassClass, spawnLocation, FRotator::ZeroRotator);
     }
-
-
-    if (glass->getDrink() == desiredDrink)
+    else if (glass->getDrink() == desiredDrink)
     {
 
         GM->OnDrinkSold();
         UE_LOG(LogTemp, Warning, TEXT("Bon cocktail servi ALIEN !"));
-        ReceiveDrink();
+        ReceiveDrink(true);
         glass->Destroy();
 		GetWorld()->SpawnActor<AGlass>(glassClass, spawnLocation, FRotator::ZeroRotator);
     }
@@ -198,7 +196,7 @@ void ACustomer::ApplyStateSprite()
         spriteComp->SetSprite(spriteToUse);
 }
 
-void ACustomer::ReceiveDrink()
+void ACustomer::ReceiveDrink(bool isAlien)
 {
     GetWorldTimerManager().ClearTimer(patienceTimer);
 
@@ -219,7 +217,10 @@ void ACustomer::ReceiveDrink()
     if (orderComp)
         orderComp->SetVisibility(false);
 	
-	StartLeaveTimer();
+    if (isAlien)
+	    StartLeaveTimer();
+    else
+        StartGoodLeaveTimer();
 }
 
 void ACustomer::ReceivedWrongDrink(EDeathCause cause)
@@ -237,13 +238,19 @@ void ACustomer::ReceivedWrongDrink(EDeathCause cause)
     if (orderComp)
         orderComp->SetVisibility(false);
 
-    StartLeaveTimer();
+    StartGoodLeaveTimer();
 }
 
 void ACustomer::StartLeaveTimer()
 {
     const float delay = 3.f;
     GetWorldTimerManager().SetTimer(leaveTimer, this, &ACustomer::Leave, delay, false);
+}
+
+void ACustomer::StartGoodLeaveTimer()
+{
+    const float delay = 3.f;
+    GetWorldTimerManager().SetTimer(leaveTimer, this, &ACustomer::FinalizeLeave, delay, false);
 }
 
 void ACustomer::Leave()

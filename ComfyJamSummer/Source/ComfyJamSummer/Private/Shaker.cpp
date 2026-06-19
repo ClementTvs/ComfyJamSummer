@@ -213,13 +213,13 @@ void AShaker::Tick(float DeltaTime)
         pc->GetMousePosition(CurrentMousePos.X, CurrentMousePos.Y);
 
         float Delta = FVector2D::Distance(CurrentMousePos, LastMousePos);
-        Delta = Delta / 20.f;
+        Delta = Delta / 125.f;
         ShakePower += Delta;
         LastMousePos = CurrentMousePos;
 
         StartShakerSound();
 
-        if (ShakePower >= 500.f)
+        if (ShakePower >= 50.f)
         {
             UE_LOG(LogTemp, Warning, TEXT("SHAKE COMPLETE!"));
             ShakePower = 0.f;
@@ -231,7 +231,7 @@ void AShaker::Tick(float DeltaTime)
         StopShakerSound();
     }
 
-    ShakePower = FMath::FInterpTo(ShakePower, 0.f, DeltaTime, 0.5f);
+    ShakePower = FMath::FInterpTo(ShakePower, 0.f, DeltaTime, 0.0005f);
 
     if (GetWorld()->GetTimerManager().IsTimerActive(IngredientTimer) && timerWidgetInstance)
     {

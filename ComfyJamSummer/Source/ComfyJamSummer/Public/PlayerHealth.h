@@ -5,6 +5,8 @@
 #include "PaperSpriteComponent.h"
 #include "PlayerHealth.generated.h"
 
+class ABackgroundActor;
+
 UENUM()
 enum class EDeathCause : uint8
 {

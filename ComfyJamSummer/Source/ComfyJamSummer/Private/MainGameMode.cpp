@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MyGameInstance.h"
+#include "MyPlayerController.h"
 #include "MainGameMode.h"
 
 void AMainGameMode::BeginPlay()
@@ -38,6 +39,18 @@ void AMainGameMode::GoodEnd()
     {
         drinksGasolineSold = 0;
         drinksSold = 0;
+        APlayerController* PC = GetWorld()->GetFirstPlayerController();
+        if (PC)
+        {
+            AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC);
+            if (MyPC)
+                MyPC->ForceRelease();
+
+            PC->bShowMouseCursor = true;
+            FInputModeUIOnly InputMode;
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            PC->SetInputMode(InputMode);
+        }
         UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), goodEndingScreen);
         EndScreen->AddToViewport();
         UGameplayStatics::SetGamePaused(this, true);
@@ -54,6 +67,18 @@ void AMainGameMode::AlienEnd()
     {
         drinksGasolineSold = 0;
         drinksSold = 0;
+        APlayerController* PC = GetWorld()->GetFirstPlayerController();
+        if (PC)
+        {
+            AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC);
+            if (MyPC)
+                MyPC->ForceRelease();
+
+            PC->bShowMouseCursor = true;
+            FInputModeUIOnly InputMode;
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            PC->SetInputMode(InputMode);
+        }
         UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), alienEndingScreen);
         EndScreen->AddToViewport();
         UGameplayStatics::SetGamePaused(this, true);

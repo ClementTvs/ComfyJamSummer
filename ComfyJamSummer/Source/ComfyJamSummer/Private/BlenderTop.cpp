@@ -13,7 +13,6 @@ ABlenderTop::ABlenderTop()
     timerWidgetInstance = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimerWidget"));
     fillHitBox->SetupAttachment(root);
     timerWidgetInstance->SetupAttachment(root);
-	timerWidgetInstance->SetupAttachment(root);
 	timerWidgetInstance->SetWidgetSpace(EWidgetSpace::World);
 	timerWidgetInstance->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
 	timerWidgetInstance->SetDrawSize(FVector2D(400.f, 80.f));

@@ -18,9 +18,9 @@ protected:
     UPROPERTY(EditAnywhere, Category = "Spawn")
     float checkInterval = 1.f;
     UPROPERTY(EditAnywhere, Category = "Spawn")
-    float spawnDelay = 15.f;
+    float spawnDelay = 20.f;
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float initialSpawnInterval = 3.f;
+	float initialSpawnInterval = 5.f;
 private:
     UPROPERTY()
     TArray<ACustomer*> occupants;

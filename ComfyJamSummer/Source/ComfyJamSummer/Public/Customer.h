@@ -22,16 +22,6 @@ class COMFYJAMSUMMER_API ACustomer : public AActor
 {
     GENERATED_BODY()
 
-private:
-    bool isOverCustomer = false;
-
-    UFUNCTION()
-    void OnGlassLeaveCustomer(
-        UPrimitiveComponent* OverlappedComp,
-        AActor* OtherActor,
-        UPrimitiveComponent* OtherComp,
-        int32 OtherBodyIndex);
-
 protected:
     virtual void BeginPlay() override;
 
@@ -90,7 +80,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sprites|Alien")
     class UPaperSprite* alienSprite;
 
-    void ReceiveDrink();
+    void ReceiveDrink(bool isAlien);
     ECustomerState GetState() const { return currentState; }
 
 private:
@@ -98,6 +88,17 @@ private:
     FTimerHandle patienceTimer;
 	FTimerHandle leaveTimer;
 
+
+    UFUNCTION()
+    void OnGlassLeaveCustomer(
+        UPrimitiveComponent* OverlappedComp,
+        AActor* OtherActor,
+        UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex);
+
+    bool isOverCustomer = false;
+
+    void StartGoodLeaveTimer();
 	void StartLeaveTimer();
 	void Leave();
 	void ReceivedWrongDrink(EDeathCause cause);
