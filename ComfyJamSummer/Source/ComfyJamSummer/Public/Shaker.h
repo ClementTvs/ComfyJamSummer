@@ -48,6 +48,8 @@ private:
 
     void StartShakerSound();
     void StopShakerSound();
+	void StartPourSound();
+	void StopPourSound();
 
 public:
     AShaker();
@@ -79,4 +81,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Pour")
 	float fillMaxDistance = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* pourSound;
+
+	UPROPERTY()
+	UAudioComponent* pourAudio = nullptr;
+
+
 };

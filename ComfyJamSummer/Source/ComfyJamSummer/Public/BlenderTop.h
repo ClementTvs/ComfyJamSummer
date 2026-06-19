@@ -7,6 +7,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/WidgetComponent.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+#include "MyGameInstance.h"
 #include "BlenderTop.generated.h"
 
 class UPouring;
@@ -33,8 +36,18 @@ private:
     void OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
         AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-    void ValidateIngredient();
-    void CancelIngredientPour();
+		
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* pourSound;
+		
+	UPROPERTY()
+	UAudioComponent* pourAudio = nullptr;
+		
+		
+		void ValidateIngredient();
+	void CancelIngredientPour();
+	void StartPourSound();
+	void StopPourSound();
 
 public:
     virtual void BeginPlay() override;

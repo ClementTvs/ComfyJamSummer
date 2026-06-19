@@ -59,6 +59,7 @@ void ABlenderTop::ValidateIngredient()
 
     pendingIngredient = nullptr;
     pendingIngredientSpout = nullptr;
+	StopPourSound();
 }
 
 void ABlenderTop::CancelIngredientPour()
@@ -66,11 +67,23 @@ void ABlenderTop::CancelIngredientPour()
     GetWorld()->GetTimerManager().ClearTimer(IngredientTimer);
     pendingIngredient = nullptr;
     pendingIngredientSpout = nullptr;
+	StopPourSound();
 }
 
-void ABlenderTop::resetDrink() { drink = EDrinks::noDrink; }
-void ABlenderTop::setDrink(EDrinks newDrink) { drink = newDrink; }
-EDrinks ABlenderTop::getDrink() const { return drink; }
+void ABlenderTop::resetDrink() 
+{ 
+	drink = EDrinks::noDrink; 
+}
+
+void ABlenderTop::setDrink(EDrinks newDrink) 
+{
+	drink = newDrink;
+}
+
+EDrinks ABlenderTop::getDrink() const 
+{ 
+	return drink;
+}
 
 void ABlenderTop::OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
     AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -124,6 +137,7 @@ void ABlenderTop::Tick(float DeltaTime)
 		{
 			const float side = (pendingIngredient->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
 			pendingIngredientSpout->KeepPouring(side);
+			StartPourSound();
 		}
 		else
 		{
@@ -147,5 +161,21 @@ void ABlenderTop::Tick(float DeltaTime)
         UUserWidget* Widget = timerWidgetInstance->GetUserWidgetObject();
         if (Widget)
             Widget->SetVisibility(ESlateVisibility::Hidden);
+    }
+}
+
+void ABlenderTop::StartPourSound()
+{
+    if (pourSound && !pourAudio)
+        if (UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance()))
+            pourAudio = GI->SpawnSFX(pourSound, 3.f);
+}
+
+void ABlenderTop::StopPourSound()
+{
+    if (pourAudio)
+    {
+        pourAudio->Stop();
+        pourAudio = nullptr;
     }
 }

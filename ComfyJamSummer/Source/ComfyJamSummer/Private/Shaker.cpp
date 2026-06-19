@@ -83,6 +83,7 @@ void AShaker::CancelIngredientPour()
     GetWorld()->GetTimerManager().ClearTimer(IngredientTimer);
     pendingIngredient = nullptr;
     pendingIngredientSpout = nullptr;
+	StopPourSound();
 }
 
 void AShaker::ValidateIngredient()
@@ -95,6 +96,7 @@ void AShaker::ValidateIngredient()
 
     pendingIngredient = nullptr;
     pendingIngredientSpout = nullptr;
+	StopPourSound();
 }
 
 bool AShaker::ContainsRecipe(const TArray<EIngredientsTypes>& recipe)
@@ -143,6 +145,7 @@ void AShaker::Tick(float DeltaTime)
 		{
 			const float side = (pendingIngredient->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
 			pendingIngredientSpout->KeepPouring(side);
+			StartPourSound();
 		}
 		else
 		{
@@ -208,5 +211,21 @@ void AShaker::StopShakerSound()
     {
         shakerAudio->Stop();
         shakerAudio = nullptr;
+    }
+}
+
+void AShaker::StartPourSound()
+{
+    if (pourSound && !pourAudio)
+        if (UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance()))
+            pourAudio = GI->SpawnSFX(pourSound, 3.f);
+}
+
+void AShaker::StopPourSound()
+{
+    if (pourAudio)
+    {
+        pourAudio->Stop();
+        pourAudio = nullptr;
     }
 }
