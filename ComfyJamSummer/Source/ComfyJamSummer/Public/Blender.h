@@ -30,14 +30,6 @@ class COMFYJAMSUMMER_API ABlender : public AActor
 
 	FTimerHandle blenderTimer;
 
-	// UFUNCTION()
-	// void OnTopTouchBottom(UPrimitiveComponent* OverlappedComp,
-	// 	AActor* OtherActor,
-	// 	UPrimitiveComponent* OtherComp,
-	// 	int32 OtherBodyIndex,
-	// 	bool bFromSweep,
-	// 	const FHitResult& SweepResult);
-
 	UFUNCTION()
 	void OnTopEnter(
 		UPrimitiveComponent* OverlappedComp,

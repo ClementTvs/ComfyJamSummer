@@ -1,12 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Ingredients.h"
+#include "Pouring.h"
 #include "Kismet/GameplayStatics.h"
 #include "Shaker.h"
 #include "Glass.h"
 #include "BlenderTop.h"
 #include "Alien.h"
-
 
 void AIngredients::BeginPlay()
 {
@@ -18,14 +16,19 @@ void AIngredients::BeginPlay()
     hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
     hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
-	hitBox->SetUsingAbsoluteRotation(true); 
+    hitBox->SetUsingAbsoluteRotation(true);
     hitBox->SetGenerateOverlapEvents(true);
 
-    UE_LOG(LogTemp, Warning, TEXT("INGREDIENT %s: WorldStatic resp=%d, enabled=%d, genOverlap=%d"),
-        *GetName(),
-        (int)hitBox->GetCollisionResponseToChannel(ECC_WorldStatic),
-        (int)hitBox->GetCollisionEnabled(),
-        hitBox->GetGenerateOverlapEvents() ? 1 : 0);
+	if (pourSpout)
+	{
+		pourSpout->directionSign = -1.f;
+
+		if (ingredientType == EIngredientsTypes::gasoline)
+		{
+			pourSpout->bFixedDirection = true;
+			pourSpout->fixedDirection = 1.f;
+		}
+	}
 }
 
 AIngredients::AIngredients()
@@ -36,20 +39,21 @@ AIngredients::AIngredients()
     fillSprite->SetupAttachment(root);
     fillSprite->SetHiddenInGame(true);
 
+    pourSpout = CreateDefaultSubobject<UPouring>(TEXT("PourSpout"));
+
     hitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     hitBox->SetCollisionObjectType(ECC_WorldDynamic);
     hitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
     hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
     hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+    hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
     hitBox->SetGenerateOverlapEvents(true);
 }
-	
+
 const EIngredientsTypes &AIngredients::getIngredientType() const
 {
     return ingredientType;
 }
-
 
 void AIngredients::OnGrabbed()
 {
@@ -76,55 +80,7 @@ void AIngredients::OnReleased()
     }
 }
 
-void AIngredients::StartPouring(bool bShouldTiltLeft)
-{
-    isPouring = true;
-    this->bTiltLeft = bShouldTiltLeft;
-}
-
-void AIngredients::StopPouring()
-{
-    isPouring = false;
-    SetActorRotation(FRotator(0.f, 0.f, 0.f));
-}
-
 void AIngredients::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    
-    if (isPouring)
-    {
-        TArray<AActor*> overlappingActors;
-        GetOverlappingActors(overlappingActors);
-        
-        bool stillOverlapping = false;
-        for (AActor* actor : overlappingActors)
-        {
-            if (actor->IsA(ABlenderTop::StaticClass()) || actor->IsA(AShaker::StaticClass()) || actor->IsA(AGlass::StaticClass()))
-            {
-                stillOverlapping = true;
-                break;
-            }
-        }
-        if (!stillOverlapping)
-        {
-            StopPouring();
-            return;
-        }
-
-        FRotator CurrentRotation = GetActorRotation();
-        float TargetPitch = 0.0f;
-        if (ingredientType == EIngredientsTypes::gasoline)
-        {
-            TargetPitch = 70.f;
-        }    
-        else
-        {
-            TargetPitch = -70.f;
-            if (bTiltLeft)
-                TargetPitch = 70.f;
-        }
-        CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetPitch, DeltaTime, 3.f);
-        SetActorRotation(CurrentRotation);
-    }
 }

@@ -1,7 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "MoveableSprite.h"
 #include "Drinks.h"
@@ -15,79 +12,68 @@
 #include "Sound/SoundBase.h"
 #include "Shaker.generated.h"
 
-
 class AIngredients;
-/**
- * 
- */
+class UPouring;
+
 UCLASS()
 class COMFYJAMSUMMER_API AShaker : public AMoveableSprite
 {
-	GENERATED_BODY()
-	
-	private:
+    GENERATED_BODY()
 
-	TArray<EIngredientsTypes> currentIngredients;
-	EDrinks drink = EDrinks::noDrink;
-	AIngredients *pendingIngredient = nullptr;
-	FTimerHandle IngredientTimer;
-	float timerDuration;
-	float ShakePower = 0.f;
-	FVector2D LastMousePos;
-	AMyPlayerController* pc;
-	bool canShake = false;
-	bool isPouring = false;
-	bool bTiltLeft = false;
+private:
+    TArray<EIngredientsTypes> currentIngredients;
+    EDrinks drink = EDrinks::noDrink;
+    AIngredients *pendingIngredient = nullptr;
+    UPouring* pendingIngredientSpout = nullptr;
+    FTimerHandle IngredientTimer;
+    float timerDuration;
+    float ShakePower = 0.f;
+    FVector2D LastMousePos;
+    AMyPlayerController* pc;
+    bool canShake = false;
 
-	UFUNCTION()
-	void OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
-	
-	UFUNCTION()
-	void OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
-	
-	void ValidateIngredient();
-	void makeDrink();
-	bool ContainsRecipe(const TArray<EIngredientsTypes>& recipe);
+    UFUNCTION()
+    void OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
+        AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void StartShakerSound();
-	void StopShakerSound();
+    UFUNCTION()
+    void OnIngredientEndOverlap(UPrimitiveComponent* OverlappedComp,
+        AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	public :
+    void ValidateIngredient();
+    void makeDrink();
+    bool ContainsRecipe(const TArray<EIngredientsTypes>& recipe);
+    void CancelIngredientPour();
 
-	void StopPouring();
-	void StartPouring(bool bShouldTiltLeft = false);
+    void StartShakerSound();
+    void StopShakerSound();
 
-	AShaker();
+public:
+    AShaker();
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaTime) override;
+    void resetDrink();
+    EDrinks getDrink() const;
 
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
-	void resetDrink();
+    UPROPERTY(VisibleAnywhere)
+    UPouring* pourSpout;
 
-	EDrinks getDrink() const;
+    UPROPERTY(VisibleAnywhere)
+    UPaperSpriteComponent* shakerOpenSprite;
 
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* shakerOpenSprite;
-	
-	UPROPERTY(VisibleAnywhere)
-	UWidgetComponent* timerWidgetInstance;
+    UPROPERTY(VisibleAnywhere)
+    UWidgetComponent* timerWidgetInstance;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UUserWidget> timerWidgetClass;
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<UUserWidget> timerWidgetClass;
 
-	UPROPERTY(VisibleAnywhere)
-	UBoxComponent *fillHitBox;
+    UPROPERTY(VisibleAnywhere)
+    UBoxComponent *fillHitBox;
 
-	UPROPERTY(EditAnywhere, Category = "Audio")
-	USoundBase* shakerSound;
+    UPROPERTY(EditAnywhere, Category = "Audio")
+    USoundBase* shakerSound;
 
-	UPROPERTY()
-	UAudioComponent* shakerAudio = nullptr;
+    UPROPERTY()
+    UAudioComponent* shakerAudio = nullptr;
 };

@@ -1,4 +1,3 @@
-// BackgroundActor.h
 #pragma once
 #include "CoreMinimal.h"
 #include "PaperSpriteComponent.h"

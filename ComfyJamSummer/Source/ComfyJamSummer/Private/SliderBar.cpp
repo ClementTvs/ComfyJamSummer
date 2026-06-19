@@ -1,4 +1,3 @@
-// SliderBar.cpp
 #include "SliderBar.h"
 
 float USliderBar::sliderValue = 0.5f;
@@ -21,7 +20,7 @@ void USliderBar::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
     if (!bInitialized)
     {
         FVector2D BarSize = SliderBar->GetCachedGeometry().GetLocalSize();
-        if (BarSize.X > 0) // géométrie prête !
+        if (BarSize.X > 0)
         {
             UpdateHandleFromValue();
             bInitialized = true;

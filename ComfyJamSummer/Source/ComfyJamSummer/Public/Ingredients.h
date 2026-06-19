@@ -1,45 +1,34 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "MoveableSprite.h"
 #include "IngredientsTypes.h"
 #include "Ingredients.generated.h"
 
-/**
- * 
- */
+class UPouring;
+
 UCLASS()
 class COMFYJAMSUMMER_API AIngredients : public AMoveableSprite
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
 
-	private:
-		
-		bool isPouring = false;
-		bool bTiltLeft = false;
-	public:
+public:
+    AIngredients();
+    virtual void BeginPlay() override;
+    const EIngredientsTypes &getIngredientType() const;
+    virtual void Tick(float DeltaTime) override;
 
-		AIngredients();
-		virtual void BeginPlay() override;
-		const EIngredientsTypes &getIngredientType() const;
-		void StopPouring();
-		void StartPouring(bool bShouldTiltLeft = false);
+    UPROPERTY(VisibleAnywhere)
+    UPouring* pourSpout;
 
-		virtual void Tick(float DeltaTime) override;
+    UPROPERTY(EditAnywhere)
+    UPaperSpriteComponent *fillSprite;
 
+    UPROPERTY(EditAnywhere)
+    EIngredientsTypes ingredientType;
 
-		UPROPERTY(EditAnywhere)
-		UPaperSpriteComponent *fillSprite;
+    UFUNCTION(BlueprintCallable, Category = "Ingredient")
+    void OnGrabbed();
 
-		UPROPERTY(EditAnywhere)
-		EIngredientsTypes ingredientType;
-
-		UFUNCTION(BlueprintCallable, Category = "Ingredient")
-		void OnGrabbed();
-
-		UFUNCTION(BlueprintCallable, Category = "Ingredient")
-		void OnReleased();
+    UFUNCTION(BlueprintCallable, Category = "Ingredient")
+    void OnReleased();
 };

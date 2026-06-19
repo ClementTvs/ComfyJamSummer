@@ -170,9 +170,12 @@ void ACustomer::UpdateState()
         return;
 
     ECustomerState newState;
-    if (patience <= angryThreshold)        newState = ECustomerState::Angry;
-    else if (patience <= annoyedThreshold) newState = ECustomerState::Annoyed;
-    else                                   newState = ECustomerState::Neutral;
+    if (patience <= angryThreshold)
+		newState = ECustomerState::Angry;
+    else if (patience <= annoyedThreshold)
+		newState = ECustomerState::Annoyed;
+    else
+		newState = ECustomerState::Neutral;
 
     if (newState != currentState)
     {
