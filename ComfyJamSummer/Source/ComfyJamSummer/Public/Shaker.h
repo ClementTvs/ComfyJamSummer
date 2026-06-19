@@ -76,4 +76,7 @@ public:
 
     UPROPERTY()
     UAudioComponent* shakerAudio = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Pour")
+	float fillMaxDistance = 100.f;
 };

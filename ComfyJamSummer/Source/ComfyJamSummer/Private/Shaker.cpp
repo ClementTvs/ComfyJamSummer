@@ -136,17 +136,18 @@ void AShaker::Tick(float DeltaTime)
 
     if (pendingIngredient && pendingIngredientSpout)
     {
-        TArray<AActor*> over;
-        GetOverlappingActors(over);
-        if (over.Contains(pendingIngredient))
-        {
-            const float side = (pendingIngredient->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
-            pendingIngredientSpout->KeepPouring(side);
-        }
-        else
-        {
-            CancelIngredientPour();
-        }
+		const FVector d = pendingIngredient->GetActorLocation() - GetActorLocation();
+		const float dist = FVector(d.X, 0.f, d.Z).Size();
+
+		if (dist <= fillMaxDistance)
+		{
+			const float side = (pendingIngredient->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
+			pendingIngredientSpout->KeepPouring(side);
+		}
+		else
+		{
+			CancelIngredientPour();
+		}
     }
 
     if (!currentIngredients.IsEmpty() && pc && pc->getIsDraggingShaker())

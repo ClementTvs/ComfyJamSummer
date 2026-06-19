@@ -48,23 +48,29 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	UFUNCTION()
 	void FillGlass();
 
-	UFUNCTION()
-	void OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex,
-		bool bFromSweep,
-		const FHitResult& SweepResult);
+	// UFUNCTION()
+	// void OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
+	// 	AActor* OtherActor,
+	// 	UPrimitiveComponent* OtherComp,
+	// 	int32 OtherBodyIndex,
+	// 	bool bFromSweep,
+	// 	const FHitResult& SweepResult);
 	
 
-	UFUNCTION()
-	void OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
-		AActor* OtherActor,
-		UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex);
+	// UFUNCTION()
+	// void OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
+	// 	AActor* OtherActor,
+	// 	UPrimitiveComponent* OtherComp,
+	// 	int32 OtherBodyIndex);
+	
+	UPROPERTY(EditAnywhere, Category = "Pour")
+	float fillMaxDistance = 100.f;
 
+	void UpdatePour();
+    void TryAcquireSpout();
 	void StartPourSound();
 	void StopPourSound();
+
 	public:
 
 	AGlass();

@@ -58,7 +58,10 @@ public:
     UPROPERTY(EditAnywhere, Category = "UI")
     TSubclassOf<UUserWidget> timerWidgetClass;
 
-    float timerDuration;
+	UPROPERTY(EditAnywhere, Category = "Pour")
+	float fillMaxDistance = 100.f;
+    
+	float timerDuration;
 
     const TArray<EIngredientsTypes>& getCurrentIngredients() const;
     void clearCurrentIngredients();

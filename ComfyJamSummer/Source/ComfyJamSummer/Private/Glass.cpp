@@ -39,8 +39,8 @@ AGlass::AGlass()
     fillHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
     fillHitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     fillHitBox->SetGenerateOverlapEvents(true);
-    fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGlass::OnBlenderOverlap);
-    fillHitBox->OnComponentEndOverlap.AddDynamic(this, &AGlass::OnBlenderEndOverlap);
+    // fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGlass::OnBlenderOverlap);
+    // fillHitBox->OnComponentEndOverlap.AddDynamic(this, &AGlass::OnBlenderEndOverlap);
 
     timerDuration = 2.0f;
     isFill = false;
@@ -110,64 +110,65 @@ void AGlass::FillGlass()
     pendingSpout = nullptr;
 }
 
-void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (GetWorld()->GetTimerManager().IsTimerActive(glassTimer))
-        return;
-    AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+// void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+//     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+// {
+// 	if (GetWorld()->GetTimerManager().IsTimerActive(glassTimer))
+//         return;
+//     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
 
-    if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
-    {
-        pendingBlender = Cast<ABlenderTop>(OtherActor);
-        drink = pendingBlender->getDrink();
-        if (drink == EDrinks::noDrink) 
-		{ 
-			pendingBlender = nullptr; 
-			return; 
-		}
+//     if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
+//     {
+//         pendingBlender = Cast<ABlenderTop>(OtherActor);
+//         drink = pendingBlender->getDrink();
+//         if (drink == EDrinks::noDrink) 
+// 		{ 
+// 			pendingBlender = nullptr; 
+// 			return; 
+// 		}
 
-        pendingSpout = OtherActor->FindComponentByClass<UPouring>();
-        GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-        StartPourSound();
-    }
-    else if (OtherActor && OtherActor->IsA(AShaker::StaticClass()) && isFill == false && pc->getIsDraggingShaker())
-    {
-        pendingShaker = Cast<AShaker>(OtherActor);
-        drink = pendingShaker->getDrink();
-        if (drink == EDrinks::noDrink) 
-		{ 
-			pendingShaker = nullptr; 
-			return; 
-		}
+//         pendingSpout = OtherActor->FindComponentByClass<UPouring>();
+//         GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+//         StartPourSound();
+//     }
+//     else if (OtherActor && OtherActor->IsA(AShaker::StaticClass()) && isFill == false && pc->getIsDraggingShaker())
+//     {
+//         pendingShaker = Cast<AShaker>(OtherActor);
+//         drink = pendingShaker->getDrink();
+//         if (drink == EDrinks::noDrink) 
+// 		{ 
+// 			pendingShaker = nullptr; 
+// 			return; 
+// 		}
 
-        pendingSpout = OtherActor->FindComponentByClass<UPouring>();
-        GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-        StartPourSound();
-    }
-    else if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()) && isFill == false)
-    {
-        AIngredients* ingredient = Cast<AIngredients>(OtherActor);
-        if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
-        {
-            pendingIngredient = ingredient;
-            drink = EDrinks::gasoline;
-            pendingSpout = OtherActor->FindComponentByClass<UPouring>();
-            GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-            StartPourSound();
-        }
-    }
-}
+//         pendingSpout = OtherActor->FindComponentByClass<UPouring>();
+//         GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+//         StartPourSound();
+//     }
+//     else if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()) && isFill == false)
+//     {
+//         AIngredients* ingredient = Cast<AIngredients>(OtherActor);
+//         if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
+//         {
+//             pendingIngredient = ingredient;
+//             drink = EDrinks::gasoline;
+//             pendingSpout = OtherActor->FindComponentByClass<UPouring>();
+//             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+//             StartPourSound();
+//         }
+//     }
+// }
 
-void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-    if (pendingSpout && OtherActor == pendingSpout->GetOwner())
-        CancelPour();
-}
+// void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+//     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+// {
+//     if (pendingSpout && OtherActor == pendingSpout->GetOwner())
+//         CancelPour();
+// }
 
 void AGlass::CancelPour()
 {
+	UE_LOG(LogTemp, Warning, TEXT("CANCEL POUR"));
     GetWorld()->GetTimerManager().ClearTimer(glassTimer);
     StopPourSound();
     pendingBlender = nullptr;
@@ -185,22 +186,7 @@ void AGlass::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (pendingSpout)
-    {
-        AActor* spoutOwner = pendingSpout->GetOwner();
-        TArray<AActor*> over;
-        fillHitBox->GetOverlappingActors(over);
-
-        if (IsValid(spoutOwner) && over.Contains(spoutOwner))
-        {
-            const float side = (spoutOwner->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
-            pendingSpout->KeepPouring(side);
-        }
-        else
-        {
-            CancelPour();
-        }
-    }
+    UpdatePour();
 
     if (GetWorld()->GetTimerManager().IsTimerActive(glassTimer) && timerWidgetInstance)
     {
@@ -233,5 +219,83 @@ void AGlass::StopPourSound()
     {
         pourAudio->Stop();
         pourAudio = nullptr;
+    }
+}
+
+void AGlass::UpdatePour()
+{
+    if (isFill)
+        return;
+
+    if (pendingSpout)
+    {
+        AActor* owner = pendingSpout->GetOwner();
+        if (!IsValid(owner))
+        {
+            CancelPour();
+            return;
+        }
+
+        const FVector d = owner->GetActorLocation() - GetActorLocation();
+        const float dist = FVector(d.X, 0.f, d.Z).Size();
+
+        if (dist <= fillMaxDistance)
+        {
+            const float side = (owner->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
+			UE_LOG(LogTemp, Warning, TEXT("KEEP dist=%f pendingSpout=%d"), dist, pendingSpout ? 1 : 0);
+            pendingSpout->KeepPouring(side);
+        }
+        else
+        {
+            CancelPour();
+        }
+    }
+    else
+    {
+        TryAcquireSpout();
+    }
+}
+
+void AGlass::TryAcquireSpout()
+{
+    AMyPlayerController* pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+    if (!pc)
+        return;
+
+    TArray<AActor*> over;
+    fillHitBox->GetOverlappingActors(over);
+
+    for (AActor* a : over)
+    {
+        if (a->IsA(ABlenderTop::StaticClass()) && !pc->getIsDragging())
+        {
+            ABlenderTop* bt = Cast<ABlenderTop>(a);
+            if (!bt || bt->getDrink() == EDrinks::noDrink) continue;
+            pendingBlender = bt;
+            drink = bt->getDrink();
+        }
+        else if (a->IsA(AShaker::StaticClass()) && pc->getIsDraggingShaker())
+        {
+            AShaker* sh = Cast<AShaker>(a);
+            if (!sh || sh->getDrink() == EDrinks::noDrink) continue;
+            pendingShaker = sh;
+            drink = sh->getDrink();
+        }
+        else if (a->IsA(AIngredients::StaticClass()))
+        {
+            AIngredients* ing = Cast<AIngredients>(a);
+            if (!ing || ing->getIngredientType() != EIngredientsTypes::gasoline) continue;
+            pendingIngredient = ing;
+            drink = EDrinks::gasoline;
+        }
+        else
+        {
+            continue;
+        }
+
+        pendingSpout  = a->FindComponentByClass<UPouring>();
+        GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
+        StartPourSound();
+        return;
     }
 }

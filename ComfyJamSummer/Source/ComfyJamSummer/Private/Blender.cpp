@@ -64,6 +64,8 @@ void ABlender::isBlenderFusionFalse()
 {
     isBlenderFusion = false;
     GetWorld()->GetTimerManager().ClearTimer(blenderTimer);
+    isBlenderWorking = false;
+    StopBlenderSound();
     UE_LOG(LogTemp, Warning, TEXT("BLENDER ARRETE"));
 }
 
@@ -213,10 +215,11 @@ void ABlender::OnTopLeaveBottom(
         {
             isBlenderFusion = false;
             GetWorld()->GetTimerManager().ClearTimer(blenderTimer);
+            isBlenderWorking = false;
+            StopBlenderSound();
         }
         isOverBlender = false;
     }
-
 }
 
 void ABlender::StartBlenderSound()
