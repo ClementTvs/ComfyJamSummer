@@ -3,6 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "BackgroundActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "MyPlayerController.h"
 #include "PlayerHealth.h"
 
 APlayerHealth::APlayerHealth()
@@ -40,11 +41,9 @@ void APlayerHealth::LoseLife(EDeathCause cause)
     UpdateHearts();
     if (arrestCount == 2)
     {
-        UE_LOG(LogTemp, Warning, TEXT("OUI"))
         BackgroundActorRef = Cast<ABackgroundActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ABackgroundActor::StaticClass()));
 	    if (BackgroundActorRef)
         {
-            UE_LOG(LogTemp, Warning, TEXT("RENTRE"))
 		    BackgroundActorRef->DeadBody();
         }
     }
@@ -79,6 +78,18 @@ void APlayerHealth::policeEnd()
     {
         arrestCount = 0;
         firedCount = 0;
+        APlayerController* PC = GetWorld()->GetFirstPlayerController();
+        if (PC)
+        {
+            AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC);
+            if (MyPC)
+                MyPC->ForceRelease();
+
+            PC->bShowMouseCursor = true;
+            FInputModeUIOnly InputMode;
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            PC->SetInputMode(InputMode);
+        }
         lockedEnding = EDeathCause::None;
         UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), policeEndingScreen);
         EndScreen->AddToViewport();
@@ -96,6 +107,18 @@ void APlayerHealth::firedEnd()
     {
         arrestCount = 0;
         firedCount = 0;
+        APlayerController* PC = GetWorld()->GetFirstPlayerController();
+        if (PC)
+        {
+            AMyPlayerController* MyPC = Cast<AMyPlayerController>(PC);
+            if (MyPC)
+                MyPC->ForceRelease();
+
+            PC->bShowMouseCursor = true;
+            FInputModeUIOnly InputMode;
+            InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+            PC->SetInputMode(InputMode);
+        }
         lockedEnding = EDeathCause::None;
         UUserWidget* EndScreen = CreateWidget<UUserWidget>(GetWorld(), firedEndingScreen);
         EndScreen->AddToViewport();

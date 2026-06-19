@@ -16,6 +16,8 @@ void AMyPlayerController::BeginPlay()
     bEnableClickEvents = true;
     bEnableMouseOverEvents = true;
     EnableInput(this);
+    
+    bInputBlocked = false;
 
     UE_LOG(LogTemp, Warning, TEXT("OUII"));
     FInputModeGameAndUI InputMode;
@@ -23,6 +25,14 @@ void AMyPlayerController::BeginPlay()
     InputMode.SetHideCursorDuringCapture(false);
     SetInputMode(InputMode);
 
+}
+
+void AMyPlayerController::ForceRelease()
+{
+    SelectedActor = nullptr;
+    isDragging = false;
+    isDraggingShaker = false;
+    bInputBlocked = true;
 }
 
 void AMyPlayerController::SetupInputComponent()
@@ -51,39 +61,42 @@ void AMyPlayerController::TogglePause()
 
 void AMyPlayerController::OnClickPressed()
 {
+    if (UGameplayStatics::IsGamePaused(this) || bInputBlocked)
+        return;
+
     FHitResult Hit;
     GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-    if (!Hit.GetActor())
+    
+    AActor* HitActor = Hit.GetActor();
+    if (!HitActor || !HitActor->IsValidLowLevel())
         return;
-    if (!Hit.GetActor()->IsA(ABlenderTop::StaticClass()))
+
+    if (!HitActor->IsA(ABlenderTop::StaticClass()))
         isDragging = true;
-    if (Hit.GetActor()->IsA(AShaker::StaticClass()))
+    if (HitActor->IsA(AShaker::StaticClass()))
         isDraggingShaker = true;
-    if (Hit.GetActor())
+
+    SelectedActor = HitActor;
+    initialLocation = SelectedActor->GetActorLocation();
+
+    if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
+        Ingredient->OnGrabbed();
+
+    if (!SelectedActor || !SelectedActor->IsValidLowLevel())
+        return;
+    if (SelectedActor->IsA(ABlenderTop::StaticClass()))
     {
-        SelectedActor = Hit.GetActor();
-        initialLocation = SelectedActor->GetActorLocation();
-
-        if (AIngredients* Ingredient = Cast<AIngredients>(SelectedActor))
-        {
-            Ingredient->OnGrabbed();
-        }
-        if (SelectedActor->IsA(ABlenderTop::StaticClass()))
-        {
-            ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
-            if (blender->IsBlenderFusion())
-            {
-                blender->isBlenderFusionFalse();
-            }
-        }
-
-		if (SelectedActor->IsA(ABlender::StaticClass()))
-                return ;
-        FVector WorldLocation, WorldDirection;
-        if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
-            GrabOffset = SelectedActor->GetActorLocation() - WorldLocation;
+        ABlender* blender = Cast<ABlender>(UGameplayStatics::GetActorOfClass(GetWorld(), ABlender::StaticClass()));
+        if (blender && blender->IsBlenderFusion())
+            blender->isBlenderFusionFalse();
     }
+
+    if (SelectedActor->IsA(ABlender::StaticClass()))
+        return;
+
+    FVector WorldLocation, WorldDirection;
+    if (DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
+        GrabOffset = SelectedActor->GetActorLocation() - WorldLocation;
 }
 
 bool AMyPlayerController::getIsDragging() const

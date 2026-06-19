@@ -41,9 +41,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Alien|Timing")
 	float WatchTimeMax = 6.f;
 	UPROPERTY(EditAnywhere, Category = "Alien|Timing")
-	float LookAwayTimeMin = 2.f;
+	float LookAwayTimeMin = 6.f;
 	UPROPERTY(EditAnywhere, Category = "Alien|Timing")
-	float LookAwayTimeMax = 4.f;
+	float LookAwayTimeMax = 9.f;
 	UPROPERTY(EditAnywhere, Category = "Alien|Audio")
 	USoundBase* turnWarningSound;
 	UPROPERTY(EditAnywhere, Category = "Alien|Timing")
