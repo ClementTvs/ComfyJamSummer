@@ -24,8 +24,13 @@ class COMFYJAMSUMMER_API ABackgroundActor : public AActor
 		UPROPERTY(EditAnywhere)
 		UPaperSpriteComponent* alien3;
 
+		UPROPERTY(EditAnywhere)
+		UPaperSpriteComponent* deadMan;
+
+		void DeadBody();
 		void UpdateBackground(int32 DrinksSold);
 
 	protected:
+
 		virtual void BeginPlay() override;
 };

@@ -32,6 +32,9 @@ private:
 
 public:
 
+	UPROPERTY()
+	ABackgroundActor* BackgroundActorRef;
+
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> policeEndingScreen;
 

@@ -1,6 +1,7 @@
 
 #include "MyGameInstance.h"
 #include "Blueprint/UserWidget.h"
+#include "BackgroundActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerHealth.h"
 
@@ -37,6 +38,16 @@ void APlayerHealth::LoseLife(EDeathCause cause)
 
     lives--;
     UpdateHearts();
+    if (arrestCount == 2)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("OUI"))
+        BackgroundActorRef = Cast<ABackgroundActor>(UGameplayStatics::GetActorOfClass(GetWorld(), ABackgroundActor::StaticClass()));
+	    if (BackgroundActorRef)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("RENTRE"))
+		    BackgroundActorRef->DeadBody();
+        }
+    }
 
     if (lockedEnding == EDeathCause::None)
     {

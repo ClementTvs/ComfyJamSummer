@@ -18,6 +18,9 @@ ABackgroundActor::ABackgroundActor()
 
     alien3 = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("alien3"));
     alien3->SetupAttachment(RootComponent);
+
+    deadMan = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("deadMan"));
+    deadMan->SetupAttachment(RootComponent);
 }
 
 void ABackgroundActor::BeginPlay()
@@ -27,6 +30,7 @@ void ABackgroundActor::BeginPlay()
     alien1->SetVisibility(false);
     alien2->SetVisibility(false);
     alien3->SetVisibility(false);
+    deadMan->SetVisibility(false);
 }
 
 void ABackgroundActor::UpdateBackground(int32 DrinksSold)
@@ -39,4 +43,9 @@ void ABackgroundActor::UpdateBackground(int32 DrinksSold)
 
     if (DrinksSold >= 9 && alien3)
         alien3->SetVisibility(true);
+}
+
+void ABackgroundActor::DeadBody()
+{
+    deadMan->SetVisibility(true);
 }
