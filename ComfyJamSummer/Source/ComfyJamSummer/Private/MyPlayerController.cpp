@@ -75,6 +75,12 @@ void AMyPlayerController::OnClickPressed()
         isDragging = true;
     if (HitActor->IsA(AShaker::StaticClass()))
         isDraggingShaker = true;
+    if (HitActor->IsA(AIngredients::StaticClass()))
+    {
+        AIngredients* ingredient = Cast<AIngredients>(HitActor);
+        if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
+            isDraggingGasoline = true;
+    }
 
     SelectedActor = HitActor;
     initialLocation = SelectedActor->GetActorLocation();
@@ -107,6 +113,11 @@ bool AMyPlayerController::getIsDragging() const
 bool AMyPlayerController::getIsDraggingShaker() const
 {
     return isDraggingShaker;
+}
+
+bool AMyPlayerController::getIsDraggingGasoline() const
+{
+    return isDraggingGasoline;
 }
 
 void AMyPlayerController::OnClickReleased()
@@ -156,6 +167,7 @@ void AMyPlayerController::OnClickReleased()
     SelectedActor = nullptr;
     isDragging = false;
     isDraggingShaker = false;
+    isDraggingGasoline = false;
 }
 
 void AMyPlayerController::Tick(float DeltaTime)

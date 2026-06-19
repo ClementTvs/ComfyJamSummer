@@ -148,7 +148,7 @@ void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
     else if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()) && isFill == false)
     {
         AIngredients* ingredient = Cast<AIngredients>(OtherActor);
-        if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
+        if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline && pc->getIsDraggingGasoline())
         {
             pendingIngredient = ingredient;
             drink = EDrinks::gasoline;
@@ -223,8 +223,9 @@ void AGlass::Tick(float DeltaTime)
 
 void AGlass::StartPourSound()
 {
+    UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
     if (pourSound && !pourAudio)
-        pourAudio = UGameplayStatics::SpawnSound2D(this, pourSound);
+        pourAudio = UGameplayStatics::SpawnSound2D(this, pourSound, GI->GetMusicVolume());
 }
 
 void AGlass::StopPourSound()

@@ -34,6 +34,7 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 
 		bool isDragging = false;
 		bool isDraggingShaker = false;
+		bool isDraggingGasoline = false;
 		void OnClickPressed();
 		void OnClickReleased();
 		void TogglePause();
@@ -57,4 +58,6 @@ class COMFYJAMSUMMER_API AMyPlayerController : public APlayerController
 
 		bool getIsDragging() const;
 		bool getIsDraggingShaker() const;
+		bool getIsDraggingGasoline() const;
+
 };

@@ -11,7 +11,7 @@ class COMFYJAMSUMMER_API UMyGameInstance : public UGameInstance
     GENERATED_BODY()
 	private:
 		float musicVolume = 0.5f;
-
+        
     public:
 
         UPROPERTY(EditAnywhere, Category = "Audio")
