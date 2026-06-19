@@ -228,6 +228,8 @@ void AGlass::UpdatePour()
     if (isFill)
         return;
 
+    AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
+
     if (pendingSpout)
     {
         AActor* owner = pendingSpout->GetOwner();
@@ -282,7 +284,7 @@ void AGlass::TryAcquireSpout()
             pendingShaker = sh;
             drink = sh->getDrink();
         }
-        else if (a->IsA(AIngredients::StaticClass()))
+        else if (a->IsA(AIngredients::StaticClass()) && pc->getIsDraggingGasoline())
         {
             AIngredients* ing = Cast<AIngredients>(a);
             if (!ing || ing->getIngredientType() != EIngredientsTypes::gasoline) continue;
