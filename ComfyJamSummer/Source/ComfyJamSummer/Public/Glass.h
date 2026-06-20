@@ -66,6 +66,10 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	UPROPERTY(EditAnywhere, Category = "Pour")
 	float fillMaxDistance = 100.f;
 
+	UPROPERTY()
+    TArray<UPaperSpriteComponent*> glassSprites;
+
+    void ShowGlassSprite(UPaperSpriteComponent* toShow);
 	void UpdatePour();
     void TryAcquireSpout();
 	void StartPourSound();

@@ -10,14 +10,21 @@ void AIngredients::BeginPlay()
 {
     Super::BeginPlay();
 
-    hitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    hitBox->SetCollisionObjectType(ECC_WorldDynamic);
-    hitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-    hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-    hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-    hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
-    hitBox->SetUsingAbsoluteRotation(true);
-    hitBox->SetGenerateOverlapEvents(true);
+	hitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	hitBox->SetCollisionObjectType(ECC_WorldDynamic);
+	hitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);  // <-- Block devient Ignore : la box ne capte plus le clic
+	hitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	hitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+	hitBox->SetUsingAbsoluteRotation(true);
+	hitBox->SetGenerateOverlapEvents(true);
+
+	// Le clic passe sur le polygone du sprite (et SEULEMENT le clic)
+	sprite->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	sprite->SetCollisionObjectType(ECC_WorldDynamic);
+	sprite->SetCollisionResponseToAllChannels(ECR_Ignore);
+	sprite->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	sprite->SetGenerateOverlapEvents(false); // surtout pas d'overlap, sinon ça pollue le pour
 
 	if (pourSpout)
 	{

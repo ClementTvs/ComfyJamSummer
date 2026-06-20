@@ -39,8 +39,6 @@ AGlass::AGlass()
     fillHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
     fillHitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
     fillHitBox->SetGenerateOverlapEvents(true);
-    // fillHitBox->OnComponentBeginOverlap.AddDynamic(this, &AGlass::OnBlenderOverlap);
-    // fillHitBox->OnComponentEndOverlap.AddDynamic(this, &AGlass::OnBlenderEndOverlap);
 
     timerDuration = 2.0f;
     isFill = false;
@@ -50,45 +48,65 @@ void AGlass::BeginPlay()
 {
     Super::BeginPlay();
     timerWidgetInstance->SetWidgetClass(timerWidgetClass);
+
+    hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+    glassSprites = {
+        sprite,
+        pinaColadaSprite, daiquiriSprite, margaritaSprite, badDrinkSprite,
+        daiquiriSpriteGasoline, margaritaSpriteGasoline, pinaColadaSpriteGasoline,
+        straightGasolineSprite
+    };
+
+    for (UPaperSpriteComponent* c : glassSprites)
+    {
+        if (!c) continue;
+        c->SetCollisionObjectType(ECC_WorldDynamic);
+        c->SetCollisionResponseToAllChannels(ECR_Ignore);
+        c->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+        c->SetGenerateOverlapEvents(false);
+        c->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    }
+    sprite->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void AGlass::FillGlass()
 {
     StopPourSound();
     isFill = true;
-    sprite->SetVisibility(false);
 
+	UPaperSpriteComponent* toShow = nullptr;
     switch (drink)
     {
         case EDrinks::pinaColada:
-			pinaColadaSprite->SetVisibility(true);
+			toShow = pinaColadaSprite;
 			break;
         case EDrinks::daiquiri:
-			daiquiriSprite->SetVisibility(true);
+			toShow = daiquiriSprite;
 			break;
         case EDrinks::margarita:
-			margaritaSprite->SetVisibility(true);
+			toShow = margaritaSprite;
 			break;
         case EDrinks::pinaColadaG:
-			pinaColadaSpriteGasoline->SetVisibility(true);
+			toShow = pinaColadaSpriteGasoline;
 			break;
         case EDrinks::daiquiriG:
-			daiquiriSpriteGasoline->SetVisibility(true);
+			toShow = daiquiriSpriteGasoline;
 			break;
         case EDrinks::margaritaG:
-			margaritaSpriteGasoline->SetVisibility(true);
+			toShow = margaritaSpriteGasoline;
 			break;
         case EDrinks::badDrink:
-			badDrinkSprite->SetVisibility(true);
+			toShow = badDrinkSprite;
 			break;
         case EDrinks::gasoline:
-			straightGasolineSprite->SetVisibility(true);
+			toShow = straightGasolineSprite;
 			break;
         default: 
 			break;
     }
-
-    if (pendingShaker)
+	ShowGlassSprite(toShow);
+    
+	if (pendingShaker)
     {
         AShaker* shaker = pendingShaker;
         pendingShaker = nullptr;
@@ -109,62 +127,6 @@ void AGlass::FillGlass()
     pendingIngredient = nullptr;
     pendingSpout = nullptr;
 }
-
-// void AGlass::OnBlenderOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-//     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-// {
-// 	if (GetWorld()->GetTimerManager().IsTimerActive(glassTimer))
-//         return;
-//     AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
-
-//     if (OtherActor && OtherActor->IsA(ABlenderTop::StaticClass()) && isFill == false && !pc->getIsDragging())
-//     {
-//         pendingBlender = Cast<ABlenderTop>(OtherActor);
-//         drink = pendingBlender->getDrink();
-//         if (drink == EDrinks::noDrink) 
-// 		{ 
-// 			pendingBlender = nullptr; 
-// 			return; 
-// 		}
-
-//         pendingSpout = OtherActor->FindComponentByClass<UPouring>();
-//         GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-//         StartPourSound();
-//     }
-//     else if (OtherActor && OtherActor->IsA(AShaker::StaticClass()) && isFill == false && pc->getIsDraggingShaker())
-//     {
-//         pendingShaker = Cast<AShaker>(OtherActor);
-//         drink = pendingShaker->getDrink();
-//         if (drink == EDrinks::noDrink) 
-// 		{ 
-// 			pendingShaker = nullptr; 
-// 			return; 
-// 		}
-
-//         pendingSpout = OtherActor->FindComponentByClass<UPouring>();
-//         GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-//         StartPourSound();
-//     }
-//     else if (OtherActor && OtherActor->IsA(AIngredients::StaticClass()) && isFill == false)
-//     {
-//         AIngredients* ingredient = Cast<AIngredients>(OtherActor);
-//         if (ingredient && ingredient->getIngredientType() == EIngredientsTypes::gasoline)
-//         {
-//             pendingIngredient = ingredient;
-//             drink = EDrinks::gasoline;
-//             pendingSpout = OtherActor->FindComponentByClass<UPouring>();
-//             GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::FillGlass, timerDuration, false);
-//             StartPourSound();
-//         }
-//     }
-// }
-
-// void AGlass::OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-//     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-// {
-//     if (pendingSpout && OtherActor == pendingSpout->GetOwner())
-//         CancelPour();
-// }
 
 void AGlass::CancelPour()
 {
@@ -301,4 +263,20 @@ void AGlass::TryAcquireSpout()
         StartPourSound();
         return;
     }
+}
+
+void AGlass::ShowGlassSprite(UPaperSpriteComponent* toShow)
+{
+    if (!toShow)
+        toShow = sprite;
+
+    for (UPaperSpriteComponent* c : glassSprites)
+    {
+        if (!c) continue;
+        c->SetVisibility(false);
+        c->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    }
+
+    toShow->SetVisibility(true);
+    toShow->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }

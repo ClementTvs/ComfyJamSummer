@@ -39,6 +39,12 @@ void AShaker::BeginPlay()
 
     fillHitBox->SetUsingAbsoluteRotation(true);
     hitBox->SetUsingAbsoluteRotation(true);
+	hitBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+    sprite->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    sprite->SetCollisionObjectType(ECC_WorldDynamic);
+    sprite->SetCollisionResponseToAllChannels(ECR_Ignore);
+    sprite->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+    sprite->SetGenerateOverlapEvents(false);
 }
 
 void AShaker::OnIngredientOverlap(UPrimitiveComponent* OverlappedComp,
