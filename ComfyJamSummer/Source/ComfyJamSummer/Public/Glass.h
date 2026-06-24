@@ -13,25 +13,21 @@
 #include "Components/AudioComponent.h"
 #include "Glass.generated.h"
 
-class Pouring;
+class UPouring;
 
 class AShaker;
 class ABlenderTop;
 
-/**
- * 
- */
 UCLASS()
 class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 {
 	GENERATED_BODY()
-	
-	private:
 
-	EDrinks drink = EDrinks::noDrink;
+private:
+	EDrinks Drink = EDrinks::noDrink;
 	FTimerHandle glassTimer;
 	float timerDuration;
-	bool isFill = false;
+	bool bIsFill = false;
 
 	UPROPERTY()
 	ABlenderTop *pendingBlender = nullptr;
@@ -41,92 +37,47 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 	AIngredients *pendingIngredient = nullptr;
 
 	UPROPERTY()
-    UPouring* pendingSpout = nullptr;
+	UPouring *pendingSpout = nullptr;
 
-    void CancelPour();
-
-	UFUNCTION()
-	void FillGlass();
-
-	// UFUNCTION()
-	// void OnBlenderOverlap(UPrimitiveComponent* OverlappedComp,
-	// 	AActor* OtherActor,
-	// 	UPrimitiveComponent* OtherComp,
-	// 	int32 OtherBodyIndex,
-	// 	bool bFromSweep,
-	// 	const FHitResult& SweepResult);
-	
-
-	// UFUNCTION()
-	// void OnBlenderEndOverlap(UPrimitiveComponent* OverlappedComp,
-	// 	AActor* OtherActor,
-	// 	UPrimitiveComponent* OtherComp,
-	// 	int32 OtherBodyIndex);
-	
 	UPROPERTY(EditAnywhere, Category = "Pour")
 	float fillMaxDistance = 100.f;
 
-	UPROPERTY()
-    TArray<UPaperSpriteComponent*> glassSprites;
-
-    void ShowGlassSprite(UPaperSpriteComponent* toShow);
 	void UpdatePour();
-    void TryAcquireSpout();
+	void TryAcquireSpout();
+	void OnPourFinished();
+	void CancelPour();
 	void StartPourSound();
 	void StopPourSound();
 
-	public:
-
+public:
 	AGlass();
 
-	void BeginPlay();
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	EDrinks getDrink() const;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent *fillHitBox;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	FVector spawnLocation;
 
-
-	UPROPERTY(EditAnywhere, Category="Spawn")
+	UPROPERTY(EditAnywhere, Category = "Spawn")
 	TSubclassOf<AGlass> glassClass;
 
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* badDrinkSprite;
+	UPROPERTY(EditAnywhere, Category = "Drinks")
+	TMap<EDrinks, UPaperSprite *> DrinkSprites;
 
 	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* pinaColadaSprite;
-
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* daiquiriSprite;
-
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* margaritaSprite;
-
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* daiquiriSpriteGasoline;
-
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* margaritaSpriteGasoline;
-	
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* pinaColadaSpriteGasoline;
-
-	UPROPERTY(VisibleAnywhere)
-	UPaperSpriteComponent* straightGasolineSprite;
-	
-	UPROPERTY(VisibleAnywhere)
-	UWidgetComponent* timerWidgetInstance;
+	UWidgetComponent *timerWidgetInstance;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> timerWidgetClass;
 
 	UPROPERTY(EditAnywhere, Category = "Audio")
-	USoundBase* pourSound;
+	USoundBase *pourSound;
 
 	UPROPERTY()
-	UAudioComponent* pourAudio = nullptr;
+	UAudioComponent *pourAudio = nullptr;
 };
