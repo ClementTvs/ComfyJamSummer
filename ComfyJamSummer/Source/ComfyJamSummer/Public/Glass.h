@@ -18,6 +18,14 @@ class UPouring;
 class AShaker;
 class ABlenderTop;
 
+UENUM()
+enum class EGlassState : uint8 
+{
+	Empty,
+	Pouring,
+	Filled
+};
+
 UCLASS()
 class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 {
@@ -25,9 +33,8 @@ class COMFYJAMSUMMER_API AGlass : public AMoveableSprite
 
 private:
 	EDrinks Drink = EDrinks::noDrink;
+	EGlassState GlassState = EGlassState::Empty;
 	FTimerHandle glassTimer;
-	float timerDuration;
-	bool bIsFill = false;
 
 	UPROPERTY()
 	ABlenderTop *pendingBlender = nullptr;
@@ -42,7 +49,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Pour")
 	float fillMaxDistance = 100.f;
 
+	UPROPERTY(EditAnywhere, Category = "Pour")
+	float timerDuration = 2.f;
+
 	void UpdatePour();
+	void KeepOrCancelPour();
 	void TryAcquireSpout();
 	void OnPourFinished();
 	void CancelPour();

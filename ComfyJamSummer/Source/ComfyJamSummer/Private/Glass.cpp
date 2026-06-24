@@ -23,9 +23,6 @@ AGlass::AGlass()
 	fillHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	fillHitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	fillHitBox->SetGenerateOverlapEvents(true);
-
-	timerDuration = 2.0f;
-	bIsFill = false;
 }
 
 void AGlass::BeginPlay()
@@ -68,36 +65,39 @@ void AGlass::Tick(float DeltaTime)
 
 void AGlass::UpdatePour()
 {
-	if (bIsFill)
-		return;
-
-	AMyPlayerController *pc = Cast<AMyPlayerController>(GetWorld()->GetFirstPlayerController());
-
-	if (pendingSpout)
+	switch (GlassState) 
 	{
-		AActor *owner = pendingSpout->GetOwner();
-		if (!IsValid(owner))
-		{
-			CancelPour();
-			return;
-		}
+		case EGlassState::Empty:
+			TryAcquireSpout();
+			break;
+		case EGlassState::Pouring:
+			KeepOrCancelPour();
+			break;
+		case EGlassState::Filled:
+			break;
+	}
+}
 
-		const FVector d = owner->GetActorLocation() - GetActorLocation();
-		const float dist = FVector(d.X, 0.f, d.Z).Size();
+void AGlass::KeepOrCancelPour()
+{
+	AActor *owner = pendingSpout->GetOwner();
+	if (!IsValid(owner))
+	{
+		CancelPour();
+		return;
+	}
 
-		if (dist <= fillMaxDistance)
-		{
-			const float side = (owner->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
-			pendingSpout->KeepPouring(side);
-		}
-		else
-		{
-			CancelPour();
-		}
+	const FVector d = owner->GetActorLocation() - GetActorLocation();
+	const float dist = FVector(d.X, 0.f, d.Z).Size();
+
+	if (dist <= fillMaxDistance)
+	{
+		const float side = (owner->GetActorLocation().X > GetActorLocation().X) ? 1.f : -1.f;
+		pendingSpout->KeepPouring(side);
 	}
 	else
 	{
-		TryAcquireSpout();
+		CancelPour();
 	}
 }
 
@@ -138,6 +138,7 @@ void AGlass::TryAcquireSpout()
 			continue;
 		}
 
+		GlassState = EGlassState::Pouring;
 		pendingSpout = a->FindComponentByClass<UPouring>();
 		GetWorld()->GetTimerManager().SetTimer(glassTimer, this, &AGlass::OnPourFinished, timerDuration, false);
 		StartPourSound();
@@ -148,7 +149,7 @@ void AGlass::TryAcquireSpout()
 void AGlass::OnPourFinished()
 {
 	StopPourSound();
-	bIsFill = true;
+	GlassState = EGlassState::Filled;
 
 	sprite->SetSprite(DrinkSprites.FindRef(Drink));
 
@@ -176,6 +177,7 @@ void AGlass::OnPourFinished()
 
 void AGlass::CancelPour()
 {
+	GlassState = EGlassState::Empty;
 	GetWorld()->GetTimerManager().ClearTimer(glassTimer);
 	StopPourSound();
 	pendingBlender = nullptr;
